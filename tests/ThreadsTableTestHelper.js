@@ -1,8 +1,8 @@
 const pool = require('../src/Infrastructures/database/postgres/pool');
 const { cleanTable } = require('./UsersTableTestHelper');
 
-const ThreadTableHelper = {
-  async addNewThread({
+const ThreadsTableTestHelper = {
+  async createThread({
     id = 'thread-123',
     title = 'new thread title',
     content = 'thread content',
@@ -36,4 +36,4 @@ const ThreadTableHelper = {
 
 };
 
-module.exports = ThreadTableHelper;
+module.exports = ThreadsTableTestHelper;

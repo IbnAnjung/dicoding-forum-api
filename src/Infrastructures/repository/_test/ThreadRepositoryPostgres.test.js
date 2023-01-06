@@ -1,12 +1,13 @@
-const ThreadTableHelper = require('../../../../tests/ThreadsTableTestHelper');
+const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const CreateThread = require('../../../Domains/threads/entities/CreateThread');
+const NewThread = require('../../../Domains/threads/entities/NewThread');
 const pool = require('../../database/postgres/pool');
 const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres');
 
 describe('ThreadRepositoryPostgres', () => {
   afterEach(async () => {
-    await ThreadTableHelper.cleanTable();
+    await ThreadsTableTestHelper.cleanTable();
   });
 
   afterAll(async () => {
@@ -27,24 +28,27 @@ describe('ThreadRepositoryPostgres', () => {
 
   describe('CreateThread function', () => {
     it('should persist add and return new thread', async () => {
-      const newThread = new CreateThread({
-        id: 'thread-123',
+      const createThread = new CreateThread({
         title: 'title',
         content: 'content',
         userId: userTest.id,
       });
 
-      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool);
+      const fakeIdGenerator = () => '123'; // stub!
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
 
-      await threadRepositoryPostgres.createThread(newThread);
+      const newThread = await threadRepositoryPostgres.createThread(createThread);
+      expect(newThread).toStrictEqual(new NewThread({
+        id: 'thread-123',
+        title: createThread.title,
+        owner: createThread.userId,
+      }));
 
-      const thread = await ThreadTableHelper.findThreadById(newThread.id);
-
+      const thread = await ThreadsTableTestHelper.findThreadById(newThread.id);
       expect(thread).toHaveLength(1);
       expect(thread[0].id).toEqual(newThread.id);
       expect(thread[0].title).toEqual(newThread.title);
-      expect(thread[0].content).toEqual(newThread.content);
-      expect(thread[0].user_id).toEqual(newThread.userId);
+      expect(thread[0].user_id).toEqual(newThread.owner);
     });
   });
 });

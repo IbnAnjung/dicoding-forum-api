@@ -6,23 +6,21 @@ describe('a CreateThread entities', () => {
       content: 'example contain',
     };
 
-    expect(() => new CreateThread(payload)).toThrowError('ADD_NEW_THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
+    expect(() => new CreateThread(payload)).toThrowError('CREATE_THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
   });
 
   it('should throw error when payload did not meet data specification', () => {
     const payload = {
-      id: 123,
       title: true,
       content: {},
       userId: 'user-123',
     };
 
-    expect(() => new CreateThread(payload)).toThrowError('ADD_NEW_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION');
+    expect(() => new CreateThread(payload)).toThrowError('CREATE_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
-  it('should create AddNeeThread object correctly', () => {
+  it('should create CreateTheread object correctly', () => {
     const payload = {
-      id: 'thread-123',
       title: 'new thread',
       content: 'its timple new thread content',
       userId: 'user-idsdf',
@@ -30,7 +28,6 @@ describe('a CreateThread entities', () => {
 
     const createThread = new CreateThread(payload);
 
-    expect(createThread.id).toEqual(payload.id);
     expect(createThread.title).toEqual(payload.title);
     expect(createThread.content).toEqual(payload.content);
     expect(createThread.userId).toEqual(payload.userId);

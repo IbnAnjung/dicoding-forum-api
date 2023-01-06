@@ -1,15 +1,19 @@
 const CreateThread = require('../../Domains/threads/entities/CreateThread');
+const NewThread = require('../../Domains/threads/entities/NewThread');
 const ThreadRepository = require('../../Domains/threads/ThreadRepository');
 
 class ThreadRepositoryPostgres extends ThreadRepository {
-  constructor(pool) {
+  constructor(pool, idGenerator) {
     super();
     this._pool = pool;
+    this._idGenerator = idGenerator;
   }
 
   async createThread({
-    id, title, content, userId,
+    title, content, userId,
   }) {
+    const id = `thread-${this._idGenerator()}`;
+
     const result = await this._pool.query({
       text: `INSERT INTO threads (id, title, content, user_id) 
         VALUES ($1, $2, $3, $4)
@@ -18,11 +22,10 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     });
 
     const newThread = result.rows[0];
-    return new CreateThread({
+    return new NewThread({
       id: newThread.id,
       title: newThread.title,
-      content: newThread.content,
-      userId: newThread.user_id,
+      owner: newThread.user_id,
     });
   }
 }
