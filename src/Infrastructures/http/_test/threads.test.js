@@ -9,21 +9,23 @@ const JwtTokenManager = require('../../security/JwtTokenManager');
 
 describe('/threads endpoint', () => {
   afterAll(async () => {
-    await AuthenticationsTableTestHelper.cleanTable();
-    await UsersTableTestHelper.cleanTable();
     await pool.end();
   });
 
   afterEach(async () => {
     await ThreadsTableTestHelper.cleanTable();
+    await AuthenticationsTableTestHelper.cleanTable();
+    await UsersTableTestHelper.cleanTable();
   });
+
   const user = {
     id: 'user-123', username: 'angga', password: '123', fullname: 'angga saputra',
   };
-  UsersTableTestHelper.addUser(user);
 
   describe('when POST /threads', () => {
     it('should response 201 and create new thread', async () => {
+      await UsersTableTestHelper.addUser(user);
+
       const requestPayload = {
         title: 'new title',
         body: 'thread body',
@@ -52,6 +54,7 @@ describe('/threads endpoint', () => {
     });
 
     it('should response 400 when request payload not contain needed property', async () => {
+      await UsersTableTestHelper.addUser(user);
       const requestPayload = {
         title: 'new title',
       };
