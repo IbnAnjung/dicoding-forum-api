@@ -16,4 +16,9 @@ describe('ThreadCommentRepository interface', () => {
     const repo = new ThreadCommentRepository();
     await expect(repo.deleteCommentById()).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   });
+
+  it('should throw error when invoke unimplemented method', async () => {
+    const repo = new ThreadCommentRepository();
+    await expect(repo.getCommentByThreadId()).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+  });
 });

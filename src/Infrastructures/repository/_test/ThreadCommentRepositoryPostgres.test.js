@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const ThreadCommentsTableTestHelper = require('../../../../tests/ThreadCommentsTableTestHelper');
 const pool = require('../../database/postgres/pool');
@@ -135,6 +136,27 @@ describe('The ThreadCommentRepositoryPostgres', () => {
       const comment = res[0];
 
       expect(comment.deleted_at).not.toBeNull();
+    });
+  });
+
+  describe('getCommentByThreadId function', () => {
+    it('should persist get comments by ids', async () => {
+      const ids = ['comments-1', 'comments-2', 'comments-3'];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const id of ids) {
+        await ThreadCommentsTableTestHelper.addNewComment({
+          id,
+          content: 'content',
+          threadId: thread.id,
+          userId: userCommentTest.id,
+        });
+      }
+
+      const repo = new ThreadCommentRepositoryPostgres(pool, {});
+      const comments = await repo.getCommentByThreadId(thread.id);
+      expect(comments).toHaveLength(3);
+      const resIds = comments.map(({ id }) => id);
+      expect(resIds).toStrictEqual(ids);
     });
   });
 });
