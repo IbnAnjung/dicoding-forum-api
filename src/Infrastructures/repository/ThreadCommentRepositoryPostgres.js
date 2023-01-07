@@ -60,13 +60,18 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
   async getCommentByThreadId(threadId) {
     const comments = await this._pool.query({
       text: `SELECT "thread_comments".id, "users".username,
-        "thread_comments".created_at date, "thread_comments".content
+        "thread_comments".created_at date,"thread_comments".deleted_at deleted,
+        "thread_comments".content
         FROM "thread_comments" 
         JOIN "users" ON "thread_comments".user_id = "users".id
         WHERE "thread_comments".thread_id = $1
         ORDER BY "thread_comments".created_at ASC`,
       values: [threadId],
     });
+
+    if (!comments.rowCount) {
+      return [];
+    }
 
     return comments.rows;
   }

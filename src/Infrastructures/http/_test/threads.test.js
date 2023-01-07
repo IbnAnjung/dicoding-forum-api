@@ -282,4 +282,73 @@ describe('/threads endpoint', () => {
       expect(responseJSON.status).toEqual('success');
     });
   });
+
+  describe('when GET /threads/{threadId}', () => {
+    it('should response 404 when thread not found', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'GET',
+        url: `/threads/${thread.id}_345`,
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJSON.status).toEqual('fail');
+      expect(typeof responseJSON.message).toBe('string');
+    });
+
+    it('should response 200 with correct detail', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+
+      await ThreadsTableTestHelper.createThread(thread);
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'commnet-2',
+        content: 'comment',
+        threadId: thread.id,
+        userId: commentUser.id,
+      });
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'commnet-1',
+        content: 'comment',
+        threadId: thread.id,
+        userId: user.id,
+      });
+
+      await ThreadCommentsTableTestHelper.softDeleteThreadCommentById('commnet-1');
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'GET',
+        url: `/threads/${thread.id}`,
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJSON.status).toEqual('success');
+      expect(responseJSON.data.thread).toBeDefined();
+
+      const resThread = responseJSON.data.thread;
+      expect(resThread.id).toEqual(thread.id);
+      expect(resThread.title).toEqual(thread.title);
+      expect(resThread.body).toEqual(thread.content);
+      expect(typeof resThread.date).toBe('string');
+      expect(resThread.username).toEqual(user.username);
+
+      const comment1 = resThread.comments[0];
+      expect(comment1.id).toEqual('commnet-2');
+      expect(comment1.username).toEqual(commentUser.username);
+      expect(typeof comment1.date).toBe('string');
+      expect(comment1.content).toBe('comment');
+
+      const comment2 = resThread.comments[1];
+      expect(comment2.id).toEqual('commnet-1');
+      expect(comment2.username).toEqual(user.username);
+      expect(typeof comment2.date).toBe('string');
+      expect(comment2.content).toBe('**komentar telah dihapus**');
+    });
+  });
 });

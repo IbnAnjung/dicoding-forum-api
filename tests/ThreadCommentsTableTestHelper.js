@@ -18,6 +18,15 @@ const ThreadCommentsTableTestHelper = {
     return result.rows;
   },
 
+  async softDeleteThreadCommentById(id) {
+    const now = new Date().toISOString();
+    const result = await pool.query({
+      text: 'UPDATE thread_comments SET deleted_at = $2  WHERE id = $1',
+      values: [id, now],
+    });
+    return result.rows;
+  },
+
   async getThreadCommentThreadId(id) {
     const result = await pool.query({
       text: 'SELECT * FROM thread_comments WHERE thread_id = $1',
