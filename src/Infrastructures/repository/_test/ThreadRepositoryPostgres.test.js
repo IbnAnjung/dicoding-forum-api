@@ -79,4 +79,23 @@ describe('ThreadRepositoryPostgres', () => {
       expect(thread).toBeNull();
     });
   });
+
+  describe('getDetailThreadById function', () => {
+    it('should presist return detail of thread', async () => {
+      await ThreadsTableTestHelper.createThread({
+        id: 'thread-123',
+        title: 'new thread title',
+        content: 'thread content',
+        userId: userTest.id,
+      });
+
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+      const thread = await threadRepositoryPostgres.getDetailThreadById('thread-123');
+      expect(thread.id).toEqual('thread-123');
+      expect(thread.title).toEqual('new thread title');
+      expect(thread.body).toEqual('thread content');
+      expect(thread.date).toBeInstanceOf(Date);
+      expect(thread.username).toEqual(userTest.username);
+    });
+  });
 });
