@@ -1,5 +1,6 @@
 const CreateThread = require('../../Domains/threads/entities/CreateThread');
 const NewThread = require('../../Domains/threads/entities/NewThread');
+const Thread = require('../../Domains/threads/entities/Thread');
 const ThreadRepository = require('../../Domains/threads/ThreadRepository');
 
 class ThreadRepositoryPostgres extends ThreadRepository {
@@ -26,6 +27,26 @@ class ThreadRepositoryPostgres extends ThreadRepository {
       id: newThread.id,
       title: newThread.title,
       owner: newThread.user_id,
+    });
+  }
+
+  async findThreadById(id) {
+    const query = {
+      text: 'SELECT id, title, content, user_id FROM threads WHERE id = $1',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      return null;
+    }
+
+    return new Thread({
+      id: result.rows[0].id,
+      title: result.rows[0].title,
+      content: result.rows[0].content,
+      owner: result.rows[0].user_id,
     });
   }
 }

@@ -5,5 +5,6 @@ describe('ThreadRepository intrafece', () => {
     const threadRepository = new ThreadRepository();
 
     await expect(threadRepository.createThread({})).rejects.toThrowError('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+    await expect(threadRepository.findThreadById('')).rejects.toThrowError('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   });
 });

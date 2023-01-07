@@ -2,6 +2,7 @@ const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const CreateThread = require('../../../Domains/threads/entities/CreateThread');
 const NewThread = require('../../../Domains/threads/entities/NewThread');
+const Thread = require('../../../Domains/threads/entities/Thread');
 const pool = require('../../database/postgres/pool');
 const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres');
 
@@ -49,6 +50,33 @@ describe('ThreadRepositoryPostgres', () => {
       expect(thread[0].id).toEqual(newThread.id);
       expect(thread[0].title).toEqual(newThread.title);
       expect(thread[0].user_id).toEqual(newThread.owner);
+    });
+  });
+
+  describe('findThreadById function', () => {
+    it('should persist return thread', async () => {
+      await ThreadsTableTestHelper.createThread({
+        id: 'thread-123',
+        title: 'new thread title',
+        content: 'thread content',
+        userId: 'user-123',
+      });
+
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+      const thread = await threadRepositoryPostgres.findThreadById('thread-123');
+      expect(thread).toStrictEqual(new Thread({
+        id: 'thread-123',
+        title: 'new thread title',
+        content: 'thread content',
+        owner: 'user-123',
+      }));
+    });
+
+    it('should persist return null', async () => {
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+      const thread = await threadRepositoryPostgres.findThreadById('thread-123');
+
+      expect(thread).toBeNull();
     });
   });
 });
