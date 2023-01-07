@@ -30,6 +30,8 @@ describe('DomainErrorTranslator', () => {
       .toStrictEqual(new InvariantError('tidak dapat membuat comment pada thread karena tipe data tidak sesuai'));
     expect(DomainErrorTranslator.translate(new Error('ADD_NEW_THREAD_COMMENT.THREAD_NOT_FOUND')))
       .toStrictEqual(new NotFoundError('Thread Tidak ditemukan'));
+    expect(DomainErrorTranslator.translate(new Error('DELETE_THREAD_COMMENT.THREAD_NOT_FOUND')))
+      .toStrictEqual(new NotFoundError('Thread Tidak ditemukan'));
   });
 
   it('should return original error when error message is not needed to translate', () => {
