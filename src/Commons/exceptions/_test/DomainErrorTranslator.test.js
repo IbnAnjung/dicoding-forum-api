@@ -1,5 +1,6 @@
 const DomainErrorTranslator = require('../DomainErrorTranslator');
 const InvariantError = require('../InvariantError');
+const NotFoundError = require('../NotFoundError');
 
 describe('DomainErrorTranslator', () => {
   it('should translate error correctly', () => {
@@ -27,6 +28,8 @@ describe('DomainErrorTranslator', () => {
       .toStrictEqual(new InvariantError('tidak dapat membuat comment pada thread, karena properti yang di butuhkan tidak ada'));
     expect(DomainErrorTranslator.translate(new Error('NEW_THREAD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION')))
       .toStrictEqual(new InvariantError('tidak dapat membuat comment pada thread karena tipe data tidak sesuai'));
+    expect(DomainErrorTranslator.translate(new Error('ADD_NEW_THREAD_COMMENT.THREAD_NOT_FOUND')))
+      .toStrictEqual(new NotFoundError('Thread Tidak ditemukan'));
   });
 
   it('should return original error when error message is not needed to translate', () => {

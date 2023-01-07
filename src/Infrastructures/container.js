@@ -11,15 +11,17 @@ const pool = require('./database/postgres/pool');
 // service (repository, helper, manager, etc)
 const UserRepository = require('../Domains/users/UserRepository');
 const ThreadRepository = require('../Domains/threads/ThreadRepository');
+const ThreadCommentRepository = require('../Domains/threads/ThreadCommentRepository');
 const PasswordHash = require('../Applications/security/PasswordHash');
 const UserRepositoryPostgres = require('./repository/UserRepositoryPostgres');
 const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgres');
-
+const ThreadCommentRepositoryPostgres = require('./repository/ThreadCommentRepositoryPostgres');
 const BcryptPasswordHash = require('./security/BcryptPasswordHash');
 
 // use case
 const AddUserUseCase = require('../Applications/use_case/AddUserUseCase');
 const AddThreadUseCase = require('../Applications/use_case/AddThreadUseCase');
+const AddThreadCommentUseCase = require('../Applications/use_case/AddThreadCommentUseCase');
 const AuthenticationTokenManager = require('../Applications/security/AuthenticationTokenManager');
 const JwtTokenManager = require('./security/JwtTokenManager');
 const LoginUserUseCase = require('../Applications/use_case/LoginUserUseCase');
@@ -61,6 +63,20 @@ container.register([
   {
     key: ThreadRepository.name,
     Class: ThreadRepositoryPostgres,
+    parameter: {
+      dependencies: [
+        {
+          concrete: pool,
+        },
+        {
+          concrete: nanoid,
+        },
+      ],
+    },
+  },
+  {
+    key: ThreadCommentRepository.name,
+    Class: ThreadCommentRepositoryPostgres,
     parameter: {
       dependencies: [
         {
@@ -124,6 +140,23 @@ container.register([
         {
           name: 'threadRepository',
           internal: ThreadRepository.name,
+        },
+      ],
+    },
+  },
+  {
+    key: AddThreadCommentUseCase.name,
+    Class: AddThreadCommentUseCase,
+    parameter: {
+      injectType: 'destructuring',
+      dependencies: [
+        {
+          name: 'threadRepository',
+          internal: ThreadRepository.name,
+        },
+        {
+          name: 'threadCommentRepository',
+          internal: ThreadCommentRepository.name,
         },
       ],
     },

@@ -7,7 +7,7 @@ describe('a AddNewThreadComment entities', () => {
       userId: 'user-123',
     };
 
-    expect(() => new AddNewThreadComment(payload)).toThrowError('CREATE_NEW_THREAD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
+    expect(() => new AddNewThreadComment(payload)).toThrowError('ADD_NEW_THREAD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
   });
 
   it('should throw error when payload did not meet data spesification', () => {
@@ -17,7 +17,7 @@ describe('a AddNewThreadComment entities', () => {
       threadId: 'thread-234',
     };
 
-    expect(() => new AddNewThreadComment(payload)).toThrowError('CREATE_NEW_THREAD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
+    expect(() => new AddNewThreadComment(payload)).toThrowError('ADD_NEW_THREAD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
   it('should create AddNewThreadComment object correctly', () => {

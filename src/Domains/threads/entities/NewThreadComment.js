@@ -11,7 +11,7 @@ class NewThreadComment {
     id, content, owner,
   }) {
     if (!id || !content || !owner) {
-      throw new Error('CREATE_NEW_THREAD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
+      throw new Error('ADD_NEW_THREAD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
     if (typeof id !== 'string' || typeof content !== 'string' || typeof owner !== 'string') {

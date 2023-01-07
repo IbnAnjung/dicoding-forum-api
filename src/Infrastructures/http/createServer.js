@@ -73,6 +73,7 @@ const createServer = async (container) => {
       }
 
       // penanganan server error sesuai kebutuhan
+      console.log(response.stack);
       const newResponse = h.response({
         status: 'error',
         message: 'terjadi kegagalan pada server kami',
