@@ -24,6 +24,24 @@ describe('/threads endpoint', () => {
     id: 'user-123', username: 'angga', password: '123', fullname: 'angga saputra',
   };
 
+  const commentUser = {
+    id: 'user-456', username: 'comment', password: '123', fullname: 'angga saputra',
+  };
+
+  const thread = {
+    id: 'thread-123',
+    title: 'title',
+    content: 'content',
+    userId: 'user-123',
+  };
+
+  const comment = {
+    id: 'comment-id',
+    userId: commentUser.id,
+    threadId: thread.id,
+    content: 'content',
+  };
+
   describe('when POST /threads', () => {
     it('should response 201 and create new thread', async () => {
       await UsersTableTestHelper.addUser(user);
@@ -93,13 +111,6 @@ describe('/threads endpoint', () => {
       const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken(user);
 
-      const thread = {
-        id: 'thread-123',
-        title: 'title',
-        content: 'content',
-        userId: 'user-123',
-      };
-
       await ThreadsTableTestHelper.createThread(thread);
 
       const server = await createServer(container);
@@ -132,13 +143,6 @@ describe('/threads endpoint', () => {
       const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken(user);
 
-      const thread = {
-        id: 'thread-123',
-        title: 'title',
-        content: 'content',
-        userId: 'user-123',
-      };
-
       const server = await createServer(container);
       const response = await server.inject({
         method: 'POST',
@@ -163,12 +167,6 @@ describe('/threads endpoint', () => {
       const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken(user);
 
-      const thread = {
-        id: 'thread-123',
-        title: 'title',
-        content: 'content',
-        userId: 'user-123',
-      };
       await ThreadsTableTestHelper.createThread(thread);
 
       const server = await createServer(container);
@@ -185,6 +183,103 @@ describe('/threads endpoint', () => {
       expect(response.statusCode).toEqual(400);
       expect(responseJSON.status).toEqual('fail');
       expect(typeof responseJSON.message).toBe('string');
+    });
+  });
+
+  describe('when DELETE /threads/{threadId}/comments/{threadCommentId}', () => {
+    it('should response 404 when thread not found', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+      await ThreadsTableTestHelper.createThread(thread);
+      await ThreadCommentsTableTestHelper.addNewComment(comment);
+
+      const jwtTokenManager = new JwtTokenManager(Jwt.token);
+      const accessToken = await jwtTokenManager.createAccessToken(commentUser);
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/another-user-id/comments/${comment.id}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJSON.status).toEqual('fail');
+      expect(typeof responseJSON.message).toBe('string');
+    });
+
+    it('should response 404 when comment not found', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+      await ThreadsTableTestHelper.createThread(thread);
+      await ThreadCommentsTableTestHelper.addNewComment(comment);
+
+      const jwtTokenManager = new JwtTokenManager(Jwt.token);
+      const accessToken = await jwtTokenManager.createAccessToken(commentUser);
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${thread.id}/comments/another-comment-id`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJSON.status).toEqual('fail');
+      expect(typeof responseJSON.message).toBe('string');
+    });
+
+    it('should response 403 when not owner user', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+      await ThreadsTableTestHelper.createThread(thread);
+      await ThreadCommentsTableTestHelper.addNewComment(comment);
+
+      const jwtTokenManager = new JwtTokenManager(Jwt.token);
+      const accessToken = await jwtTokenManager.createAccessToken(user);
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${thread.id}/comments/${comment.id}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(403);
+      expect(responseJSON.status).toEqual('fail');
+      expect(typeof responseJSON.message).toBe('string');
+    });
+
+    it('should response 200 when request is good', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+      await ThreadsTableTestHelper.createThread(thread);
+      await ThreadCommentsTableTestHelper.addNewComment(comment);
+
+      const jwtTokenManager = new JwtTokenManager(Jwt.token);
+      const accessToken = await jwtTokenManager.createAccessToken(commentUser);
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${thread.id}/comments/${comment.id}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJSON.status).toEqual('success');
     });
   });
 });

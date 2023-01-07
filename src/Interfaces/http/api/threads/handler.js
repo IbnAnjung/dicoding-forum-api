@@ -1,5 +1,6 @@
 const AddThreadCommentUseCase = require('../../../../Applications/use_case/AddThreadCommentUseCase');
 const AddThreadUseCase = require('../../../../Applications/use_case/AddThreadUseCase');
+const DeleteThreadCommentUseCase = require('../../../../Applications/use_case/DeleteThreadCommentUseCase');
 const AddNewThreadComment = require('../../../../Domains/threads/entities/AddNewThreadComment');
 const CreateThread = require('../../../../Domains/threads/entities/CreateThread');
 
@@ -9,6 +10,7 @@ class ThreadsHandler {
 
     this.postThreadHandler = this.postThreadHandler.bind(this);
     this.postThreadCommentHandler = this.postThreadCommentHandler.bind(this);
+    this.deleteThreadCommentHanlder = this.deleteThreadCommentHanlder.bind(this);
   }
 
   async postThreadHandler(r, h) {
@@ -48,6 +50,19 @@ class ThreadsHandler {
     });
     response.code(201);
     return response;
+  }
+
+  async deleteThreadCommentHanlder(r, h) {
+    const { id: userId } = r.auth.credentials;
+    const { threadId, threadCommentId } = r.params;
+    const uc = this._container.getInstance(DeleteThreadCommentUseCase.name);
+    await uc.execute({
+      userId, threadId, threadCommentId,
+    });
+
+    return h.response({
+      status: 'success',
+    });
   }
 }
 
