@@ -1,3 +1,5 @@
+const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
+const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const NewThreadComment = require('../../Domains/threads/entities/NewThreadComment');
 const ThreadCommentRepository = require('../../Domains/threads/ThreadCommentRepository');
 
@@ -23,6 +25,33 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
       id: newComment.id,
       content: newComment.content,
       owner: newComment.user_id,
+    });
+  }
+
+  async verifyThreadCommentAndCommentOwner({ threadCommentId, userId }) {
+    const query = {
+      text: `SELECT user_id 
+        FROM thread_comments WHERE id = $1`,
+      values: [threadCommentId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Comment tidak ditemukan');
+    }
+
+    if (result.rows[0].user_id !== userId) {
+      throw new AuthorizationError('Kamu bukan pemilik comment ini');
+    }
+  }
+
+  async deleteCommentById(threadCommentId) {
+    const timestamps = new Date().toISOString();
+    await this._pool.query({
+      text: `UPDATE thread_comments SET deleted_at=$1
+        WHERE id = $2`,
+      values: [timestamps, threadCommentId],
     });
   }
 }

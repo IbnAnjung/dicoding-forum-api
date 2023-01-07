@@ -5,21 +5,20 @@ const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const AddNewThreadComment = require('../../../Domains/threads/entities/AddNewThreadComment');
 const NewThreadComment = require('../../../Domains/threads/entities/NewThreadComment');
 const ThreadCommentRepositoryPostgres = require('../ThreadCommentRepositoryPostgres');
+const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 
 describe('The ThreadCommentRepositoryPostgres', () => {
-  afterEach(async () => {
-    await ThreadCommentsTableTestHelper.cleanTable();
-  });
-
-  afterAll(async () => {
-    await ThreadsTableTestHelper.cleanTable();
-    await UsersTableTestHelper.cleanTable();
-    await pool.end();
-  });
-
   const userTest = {
     id: 'user-123',
     username: 'test',
+    password: 'secret',
+    fullname: 'User Thread Test',
+  };
+
+  const userCommentTest = {
+    id: 'user-456',
+    username: 'comment_test',
     password: 'secret',
     fullname: 'User Thread Test',
   };
@@ -31,9 +30,20 @@ describe('The ThreadCommentRepositoryPostgres', () => {
     userId: userTest.id,
   };
 
-  beforeAll(async () => {
+  afterEach(async () => {
+    await ThreadCommentsTableTestHelper.cleanTable();
+    await ThreadsTableTestHelper.cleanTable();
+    await UsersTableTestHelper.cleanTable();
+  });
+
+  beforeEach(async () => {
     await UsersTableTestHelper.addUser(userTest);
+    await UsersTableTestHelper.addUser(userCommentTest);
     await ThreadsTableTestHelper.createThread(thread);
+  });
+
+  afterAll(async () => {
+    await pool.end();
   });
 
   describe('addNewComment function', () => {
@@ -59,6 +69,72 @@ describe('The ThreadCommentRepositoryPostgres', () => {
       expect(comment[0].id).toEqual(newComment.id);
       expect(comment[0].content).toEqual(newComment.content);
       expect(comment[0].owner).toEqual(newComment.user_id);
+    });
+  });
+
+  describe('verifyThreadCommentAndCommentOwner function', () => {
+    it('should not throw error when userId is equal to comment owner', async () => {
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'comments-123',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+      });
+      const repo = new ThreadCommentRepositoryPostgres(pool, {});
+      await expect(repo.verifyThreadCommentAndCommentOwner({
+        threadCommentId: 'comments-123',
+        userId: userCommentTest.id,
+      })).resolves.not.toThrowError(AuthorizationError);
+    });
+
+    it('should throw Authentication error when userId not equal to comment owner', async () => {
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'comments-123',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+      });
+
+      const repo = new ThreadCommentRepositoryPostgres(pool, {});
+
+      await expect(repo.verifyThreadCommentAndCommentOwner({
+        threadCommentId: 'comments-123',
+        userId: userTest.id,
+      })).rejects.toThrowError(AuthorizationError);
+    });
+
+    it('should throw NotFound error when userId not equal to comment owner', async () => {
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'comments-123',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+      });
+
+      const repo = new ThreadCommentRepositoryPostgres(pool, {});
+
+      await expect(repo.verifyThreadCommentAndCommentOwner({
+        threadCommentId: 'another-comments-id',
+        userId: userTest.id,
+      })).rejects.toThrowError(NotFoundError);
+    });
+  });
+
+  describe('deleteCommentById function', () => {
+    it('should persist soft deleted comment by fill deleted_at', async () => {
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'comments-123',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+      });
+
+      const repo = new ThreadCommentRepositoryPostgres(pool);
+      await repo.deleteCommentById('comments-123');
+      const res = await ThreadCommentsTableTestHelper.findThreadCommentById('comments-123');
+      const comment = res[0];
+
+      expect(comment.deleted_at).not.toBeNull();
     });
   });
 });
