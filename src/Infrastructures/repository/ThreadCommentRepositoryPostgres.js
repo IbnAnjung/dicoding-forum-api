@@ -14,10 +14,12 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     threadId, content, userId,
   }) {
     const id = `comment-${this._idGenerator()}`;
+    const createdAt = new Date().toISOString();
+
     const res = await this._pool.query({
-      text: `INSERT INTO thread_comments (id, content, thread_id, user_id)
-        VALUES ($1, $2, $3, $4) RETURNING id, content, user_id`,
-      values: [id, content, threadId, userId],
+      text: `INSERT INTO thread_comments (id, content, thread_id, user_id, created_at)
+        VALUES ($1, $2, $3, $4, $5) RETURNING id, content, user_id`,
+      values: [id, content, threadId, userId, createdAt],
     });
 
     const newComment = res.rows[0];
