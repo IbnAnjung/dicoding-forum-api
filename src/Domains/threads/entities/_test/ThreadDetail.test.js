@@ -27,16 +27,51 @@ describe('a ThreadDetail entities', () => {
       ],
     };
 
+    const payloadInvalidOnReplies = {
+      id: '123',
+      title: 'title',
+      body: 'thread body',
+      username: 'angga',
+      date: '2022-01-02',
+      comments: [
+        {
+          id: 'comment-2',
+          username: 'comment user',
+          date: '2022-01-02',
+          content: 'content',
+          replies: [
+            {
+              id: 'replies-2',
+              username: 'comment user',
+              date: '2022-01-02',
+              content: 123,
+            },
+          ],
+        },
+      ],
+    };
+
     expect(() => new ThreadDetail(payload)).toThrowError('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
+    expect(() => new ThreadDetail(payloadInvalidOnReplies)).toThrowError('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
   it('should create CreateTheread object correctly', () => {
+    const replies = [
+      {
+        id: 'comment-1',
+        username: 'comment user',
+        date: '2023-01-01T07:22:33.555Z',
+        content: 'coment',
+      },
+    ];
+
     const comments = [
       {
         id: 'comment-1',
         username: 'comment user',
         date: '2023-01-01T07:22:33.555Z',
         content: 'coment',
+        replies,
       },
     ];
 
@@ -57,5 +92,6 @@ describe('a ThreadDetail entities', () => {
     expect(thread.username).toEqual(payload.username);
     expect(thread.date).toEqual(payload.date);
     expect(thread.comments).toStrictEqual(comments);
+    expect(thread.comments[0].replies).toStrictEqual(replies);
   });
 });

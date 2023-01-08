@@ -11,9 +11,9 @@ class ThreadDetail {
   }
 
   verifyPayload({
-    id, title, body, username, date, comments,
+    id, title, body, username, date, comments = [],
   }) {
-    if (!id || !title || !body || !username || !date || !comments) {
+    if (!id || !title || !body || !username || !date) {
       throw new Error('THREAD_DETAIL.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
@@ -29,7 +29,7 @@ class ThreadDetail {
       throw new Error('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
 
-    comments.forEach((comment) => {
+    const validateComment = (comment) => {
       if (!comment.id || !comment.username || !comment.date || !comment.content) {
         throw new Error('THREAD_DETAIL.NOT_CONTAIN_NEEDED_PROPERTY');
       }
@@ -42,6 +42,15 @@ class ThreadDetail {
 
       if (!(new Date(comment.date).getTime() > 0)) {
         throw new Error('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
+      }
+    };
+
+    comments.forEach((comment) => {
+      validateComment(comment);
+      if (Array.isArray(comment.replies)) {
+        comment.replies.forEach((reply) => {
+          validateComment(reply);
+        });
       }
     });
 
