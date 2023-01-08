@@ -23,9 +23,9 @@ class GetThreadDetailUseCase {
     replies.forEach((reply) => {
       const newReply = reply;
       if (newReply.deleted) {
-        newReply.content = '**komentar telah dihapus**';
+        newReply.content = '**balasan telah dihapus**';
       }
-      delete newReply.delteted;
+      delete newReply.deleted;
       commentByIds[newReply.comment].replies.push(newReply);
     });
     thread.comments = [];

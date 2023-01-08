@@ -101,6 +101,6 @@ describe('GetThreadDetailUseCase', () => {
     expect(threadDetail.comments[1].replies[0].id).toEqual(replies[2].id);
     expect(threadDetail.comments[1].replies[0].username).toEqual(replies[2].username);
     expect(threadDetail.comments[1].replies[0].date).toEqual(replies[2].date);
-    expect(threadDetail.comments[1].replies[0].content).toEqual('**komentar telah dihapus**');
+    expect(threadDetail.comments[1].replies[0].content).toEqual('**balasan telah dihapus**');
   });
 });

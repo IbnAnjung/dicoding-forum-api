@@ -123,6 +123,60 @@ describe('The ThreadCommentRepositoryPostgres', () => {
     });
   });
 
+  describe('verifyThreadCommentReplyAndCommentReplyOwner function', () => {
+    it('should not throw error when userId is exists and equal to comment owner', async () => {
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'reply-123',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+        commentParentId: 'comment-123',
+      });
+      const repo = new ThreadCommentRepositoryPostgres(pool, {});
+      await expect(repo.verifyThreadCommentReplyAndCommentReplyOwner({
+        threadCommentId: 'comment-123',
+        replyId: 'reply-123',
+        userId: userCommentTest.id,
+      })).resolves.not.toThrowError();
+    });
+
+    it('should throw Authentication error when userId not equal to comment owner', async () => {
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'reply-123',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+        commentParentId: 'comment-1234',
+      });
+
+      const repo = new ThreadCommentRepositoryPostgres(pool, {});
+
+      await expect(repo.verifyThreadCommentReplyAndCommentReplyOwner({
+        threadCommentId: 'comment-1234',
+        userId: userTest.id,
+        replyId: 'reply-123',
+      })).rejects.toThrowError(AuthorizationError);
+    });
+
+    it('should throw NotFound error when not exists', async () => {
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'reply-123',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+        commentParentId: 'comment-123',
+      });
+
+      const repo = new ThreadCommentRepositoryPostgres(pool, {});
+
+      await expect(repo.verifyThreadCommentReplyAndCommentReplyOwner({
+        threadCommentId: 'another-comments-id',
+        userId: userTest.id,
+        replyId: 'reply-123-wrong',
+      })).rejects.toThrowError(NotFoundError);
+    });
+  });
+
   describe('deleteCommentById function', () => {
     it('should persist soft deleted comment by fill deleted_at', async () => {
       await ThreadCommentsTableTestHelper.addNewComment({
@@ -138,6 +192,33 @@ describe('The ThreadCommentRepositoryPostgres', () => {
       const comment = res[0];
 
       expect(comment.deleted_at).not.toBeNull();
+    });
+  });
+
+  describe('deleteCommentById function', () => {
+    it('should persist soft deleted comment by fill deleted_at', async () => {
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'comments-123',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+      });
+
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'reply-123',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+        commentParentId: 'comment-123',
+      });
+      const repo = new ThreadCommentRepositoryPostgres(pool);
+      await repo.deleteCommentReplyById('reply-123');
+      await repo.deleteCommentReplyById('comments-123');
+      const rep = await ThreadCommentsTableTestHelper.findThreadCommentById('reply-123');
+      const com = await ThreadCommentsTableTestHelper.findThreadCommentById('comments-123');
+
+      expect(rep[0].deleted_at).not.toBeNull();
+      expect(com[0].deleted_at).toBeNull();
     });
   });
 

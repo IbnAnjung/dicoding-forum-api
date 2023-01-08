@@ -68,11 +68,41 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     }
   }
 
+  async verifyThreadCommentReplyAndCommentReplyOwner({
+    replyId, threadCommentId, userId,
+  }) {
+    const query = {
+      text: `SELECT user_id 
+        FROM thread_comments WHERE id = $1
+          AND comment_parent_id = $2`,
+      values: [replyId, threadCommentId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Comment tidak ditemukan');
+    }
+
+    if (result.rows[0].user_id !== userId) {
+      throw new AuthorizationError('Kamu bukan pemilik comment ini');
+    }
+  }
+
   async deleteCommentById(threadCommentId) {
     const timestamps = new Date().toISOString();
     await this._pool.query({
       text: `UPDATE thread_comments SET deleted_at=$1
         WHERE id = $2`,
+      values: [timestamps, threadCommentId],
+    });
+  }
+
+  async deleteCommentReplyById(threadCommentId) {
+    const timestamps = new Date().toISOString();
+    await this._pool.query({
+      text: `UPDATE thread_comments SET deleted_at=$1
+        WHERE id = $2 AND comment_parent_id IS NOT NULL`,
       values: [timestamps, threadCommentId],
     });
   }

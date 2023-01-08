@@ -42,6 +42,14 @@ describe('/threads endpoint', () => {
     content: 'content',
   };
 
+  const reply = {
+    id: 'reply-1',
+    commentParentId: 'comment-1',
+    userId: commentUser.id,
+    threadId: thread.id,
+    content: 'content',
+  };
+
   const thread2 = {
     id: 'thread-2',
     title: 'title',
@@ -297,6 +305,107 @@ describe('/threads endpoint', () => {
     });
   });
 
+  describe('when DELETE /threads/{threadId}/comments/{threadCommentId}', () => {
+    it('should response 404 when thread not found', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+      await ThreadsTableTestHelper.createThread(thread);
+      await ThreadCommentsTableTestHelper.addNewComment(comment);
+      await ThreadCommentsTableTestHelper.addNewComment(reply);
+
+      const jwtTokenManager = new JwtTokenManager(Jwt.token);
+      const accessToken = await jwtTokenManager.createAccessToken(commentUser);
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/wrong-${thread.id}/comments/${comment.id}/replies/${reply.id}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJSON.status).toEqual('fail');
+      expect(typeof responseJSON.message).toBe('string');
+    });
+
+    it('should response 404 when comment reply not found', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+      await ThreadsTableTestHelper.createThread(thread);
+      await ThreadCommentsTableTestHelper.addNewComment(comment);
+      await ThreadCommentsTableTestHelper.addNewComment(reply);
+
+      const jwtTokenManager = new JwtTokenManager(Jwt.token);
+      const accessToken = await jwtTokenManager.createAccessToken(commentUser);
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${thread.id}/comments/${comment.id}/replies/wrong-replies-id`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJSON.status).toEqual('fail');
+      expect(typeof responseJSON.message).toBe('string');
+    });
+
+    it('should response 403 when not owner user', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+      await ThreadsTableTestHelper.createThread(thread);
+      await ThreadCommentsTableTestHelper.addNewComment(comment);
+      await ThreadCommentsTableTestHelper.addNewComment(reply);
+
+      const jwtTokenManager = new JwtTokenManager(Jwt.token);
+      const accessToken = await jwtTokenManager.createAccessToken(user);
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${thread.id}/comments/${comment.id}/replies/${reply.id}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(403);
+      expect(responseJSON.status).toEqual('fail');
+      expect(typeof responseJSON.message).toBe('string');
+    });
+
+    it('should response 200 when request is good', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+      await ThreadsTableTestHelper.createThread(thread);
+      await ThreadCommentsTableTestHelper.addNewComment(comment);
+      await ThreadCommentsTableTestHelper.addNewComment(reply);
+
+      const jwtTokenManager = new JwtTokenManager(Jwt.token);
+      const accessToken = await jwtTokenManager.createAccessToken(commentUser);
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${thread.id}/comments/${comment.id}/replies/${reply.id}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJSON.status).toEqual('success');
+    });
+  });
+
   describe('when GET /threads/{threadId}', () => {
     it('should response 404 when thread not found', async () => {
       await UsersTableTestHelper.addUser(user);
@@ -377,7 +486,7 @@ describe('/threads endpoint', () => {
       expect(resComment1.replies[0].id).toEqual('reply-1');
       expect(resComment1.replies[0].username).toEqual(user.username);
       expect(typeof resComment1.replies[0].date).toBe('string');
-      expect(resComment1.replies[0].content).toEqual('**komentar telah dihapus**');
+      expect(resComment1.replies[0].content).toEqual('**balasan telah dihapus**');
       expect(resComment1.replies[1].id).toEqual('reply-2');
       expect(resComment1.replies[1].username).toEqual(user.username);
       expect(typeof resComment1.replies[1].date).toBe('string');

@@ -23,7 +23,15 @@ class ThreadCommentRepository {
     throw new Error('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
 
+  async verifyThreadCommentReplyAndCommentReplyOwner({ threadCommentId, userId }) {
+    throw new Error('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+  }
+
   async deleteCommentById(threadCommentId) {
+    throw new Error('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+  }
+
+  async deleteCommentReplyById(threadCommentId) {
     throw new Error('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
 }

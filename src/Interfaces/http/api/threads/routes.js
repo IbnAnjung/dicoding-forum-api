@@ -26,7 +26,15 @@ const routes = (handler) => ([
   {
     method: 'DELETE',
     path: '/threads/{threadId}/comments/{threadCommentId}',
-    handler: handler.deleteThreadCommentHanlder,
+    handler: handler.deleteThreadCommentHandler,
+    options: {
+      auth: 'jwt',
+    },
+  },
+  {
+    method: 'DELETE',
+    path: '/threads/{threadId}/comments/{threadCommentId}/replies/{threadCommentReplyId}',
+    handler: handler.deleteThreadCommentReplyHandler,
     options: {
       auth: 'jwt',
     },
@@ -34,7 +42,7 @@ const routes = (handler) => ([
   {
     method: 'GET',
     path: '/threads/{threadId}',
-    handler: handler.getThreadDetailHanlder,
+    handler: handler.getThreadDetailHandler,
   },
 ]);
 
