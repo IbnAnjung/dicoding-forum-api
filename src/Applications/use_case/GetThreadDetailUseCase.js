@@ -12,13 +12,31 @@ class GetThreadDetailUseCase {
     }
 
     const comments = await this._threadCommentRepository.getCommentByThreadId(threadId);
-    thread.comments = comments.map((comment) => {
-      if (comment.deleted) {
-        comment.content = '**komentar telah dihapus**';
+    const commentByIds = [];
+    await comments.forEach((comment) => {
+      const newComment = comment;
+      newComment.replies = [];
+      commentByIds[comment.id] = newComment;
+    });
+    const replies = await this._threadCommentRepository
+      .getCommentRepliesByCommentIds(comments.map((comment) => comment.id));
+    replies.forEach((reply) => {
+      const newReply = reply;
+      if (newReply.deleted) {
+        newReply.content = '**komentar telah dihapus**';
+      }
+      delete newReply.delteted;
+      commentByIds[newReply.comment].replies.push(newReply);
+    });
+    thread.comments = [];
+    comments.forEach((comment) => {
+      const newComment = commentByIds[comment.id];
+      if (newComment.deleted) {
+        newComment.content = '**komentar telah dihapus**';
       }
 
-      delete comment.deleted;
-      return comment;
+      delete newComment.deleted;
+      thread.comments.push(newComment);
     });
 
     return thread;

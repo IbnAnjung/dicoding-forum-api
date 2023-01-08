@@ -332,7 +332,23 @@ describe('/threads endpoint', () => {
         userId: user.id,
       });
 
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'reply-1',
+        commentParentId: 'commnet-2',
+        content: 'comment',
+        threadId: thread.id,
+        userId: user.id,
+      });
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'reply-2',
+        commentParentId: 'commnet-2',
+        content: 'comment',
+        threadId: thread.id,
+        userId: user.id,
+      });
+
       await ThreadCommentsTableTestHelper.softDeleteThreadCommentById('commnet-1');
+      await ThreadCommentsTableTestHelper.softDeleteThreadCommentById('reply-1');
 
       const server = await createServer(container);
       const response = await server.inject({
@@ -357,12 +373,22 @@ describe('/threads endpoint', () => {
       expect(resComment1.username).toEqual(commentUser.username);
       expect(typeof resComment1.date).toBe('string');
       expect(resComment1.content).toBe('comment');
+      expect(resComment1.replies).toHaveLength(2);
+      expect(resComment1.replies[0].id).toEqual('reply-1');
+      expect(resComment1.replies[0].username).toEqual(user.username);
+      expect(typeof resComment1.replies[0].date).toBe('string');
+      expect(resComment1.replies[0].content).toEqual('**komentar telah dihapus**');
+      expect(resComment1.replies[1].id).toEqual('reply-2');
+      expect(resComment1.replies[1].username).toEqual(user.username);
+      expect(typeof resComment1.replies[1].date).toBe('string');
+      expect(resComment1.replies[1].content).toEqual('comment');
 
       const resComment2 = resThread.comments[1];
       expect(resComment2.id).toEqual('commnet-1');
       expect(resComment2.username).toEqual(user.username);
       expect(typeof resComment2.date).toBe('string');
-      expect(resComment2.content).toBe('**komentar telah dihapus**');
+      expect(resComment2.content).toEqual('**komentar telah dihapus**');
+      expect(resComment2.replies).toHaveLength(0);
     });
   });
 

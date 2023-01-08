@@ -154,6 +154,14 @@ describe('The ThreadCommentRepositoryPostgres', () => {
         });
       }
 
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'reply-1',
+        commentParentId: 'comments-1',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+      });
+
       const repo = new ThreadCommentRepositoryPostgres(pool, {});
       const comments = await repo.getCommentByThreadId(thread.id);
       expect(comments).toHaveLength(3);
@@ -226,6 +234,51 @@ describe('The ThreadCommentRepositoryPostgres', () => {
         threadId: sample.threadId,
         owner: sample.userId,
       });
+    });
+  });
+
+  describe('getCommentRepliesByCommentIds function', () => {
+    it('should return all comment replies', async () => {
+      const comment = {
+        id: 'comment-1',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+      };
+      const comment2 = {
+        id: 'comment-2',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+      };
+
+      await ThreadCommentsTableTestHelper.addNewComment(comment);
+      await ThreadCommentsTableTestHelper.addNewComment(comment2);
+
+      const replies1 = {
+        id: 'replies-1',
+        commentParentId: comment.id,
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+      };
+      const replies2 = {
+        id: 'replies-2',
+        commentParentId: comment2.id,
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+      };
+
+      await ThreadCommentsTableTestHelper.addNewComment(replies1);
+      await ThreadCommentsTableTestHelper.addNewComment(replies2);
+      const repo = new ThreadCommentRepositoryPostgres(pool, {});
+      const res = await repo
+        .getCommentRepliesByCommentIds([replies1.commentParentId, replies2.commentParentId]);
+
+      expect(res).toHaveLength(2);
+      expect(res[0].id).toEqual(replies1.id);
+      expect(res[1].id).toEqual(replies2.id);
     });
   });
 });
