@@ -29,16 +29,30 @@ describe('/threads endpoint', () => {
   };
 
   const thread = {
-    id: 'thread-123',
+    id: 'thread-1',
     title: 'title',
     content: 'content',
     userId: 'user-123',
   };
 
   const comment = {
-    id: 'comment-id',
+    id: 'comment-1',
     userId: commentUser.id,
     threadId: thread.id,
+    content: 'content',
+  };
+
+  const thread2 = {
+    id: 'thread-2',
+    title: 'title',
+    content: 'content',
+    userId: 'user-123',
+  };
+
+  const comment2 = {
+    id: 'comment-2',
+    userId: commentUser.id,
+    threadId: thread2.id,
     content: 'content',
   };
 
@@ -338,17 +352,106 @@ describe('/threads endpoint', () => {
       expect(typeof resThread.date).toBe('string');
       expect(resThread.username).toEqual(user.username);
 
-      const comment1 = resThread.comments[0];
-      expect(comment1.id).toEqual('commnet-2');
-      expect(comment1.username).toEqual(commentUser.username);
-      expect(typeof comment1.date).toBe('string');
-      expect(comment1.content).toBe('comment');
+      const resComment1 = resThread.comments[0];
+      expect(resComment1.id).toEqual('commnet-2');
+      expect(resComment1.username).toEqual(commentUser.username);
+      expect(typeof resComment1.date).toBe('string');
+      expect(resComment1.content).toBe('comment');
 
-      const comment2 = resThread.comments[1];
-      expect(comment2.id).toEqual('commnet-1');
-      expect(comment2.username).toEqual(user.username);
-      expect(typeof comment2.date).toBe('string');
-      expect(comment2.content).toBe('**komentar telah dihapus**');
+      const resComment2 = resThread.comments[1];
+      expect(resComment2.id).toEqual('commnet-1');
+      expect(resComment2.username).toEqual(user.username);
+      expect(typeof resComment2.date).toBe('string');
+      expect(resComment2.content).toBe('**komentar telah dihapus**');
+    });
+  });
+
+  describe('when POST /threads/{threadId}/comments/{commentId}/replies', () => {
+    it('should response 404 when comment not found', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+
+      const jwtTokenManager = new JwtTokenManager(Jwt.token);
+      const accessToken = await jwtTokenManager.createAccessToken(user);
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'POST',
+        url: `/threads/${thread.id}/comments/${comment.id}/replies`,
+        payload: {
+          content: 'content',
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJSON.status).toEqual('fail');
+      expect(typeof responseJSON.message).toBe('string');
+    });
+
+    it('should response 404 when threadId not match with comment threadId', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+      await ThreadsTableTestHelper.createThread(thread);
+      await ThreadsTableTestHelper.createThread(thread2);
+      await ThreadCommentsTableTestHelper.addNewComment(comment);
+      await ThreadCommentsTableTestHelper.addNewComment(comment2);
+
+      const jwtTokenManager = new JwtTokenManager(Jwt.token);
+      const accessToken = await jwtTokenManager.createAccessToken(user);
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'POST',
+        url: `/threads/${thread.id}/comments/${comment2.id}/replies`,
+        payload: {
+          content: 'content',
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJSON.status).toEqual('fail');
+      expect(typeof responseJSON.message).toBe('string');
+    });
+
+    it('should response 201 and create valid response', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+      await ThreadsTableTestHelper.createThread(thread);
+      await ThreadCommentsTableTestHelper.addNewComment(comment);
+
+      const jwtTokenManager = new JwtTokenManager(Jwt.token);
+      const accessToken = await jwtTokenManager.createAccessToken(user);
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'POST',
+        url: `/threads/${thread.id}/comments/${comment.id}/replies`,
+        payload: {
+          content: 'content',
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(201);
+      expect(responseJSON.status).toEqual('success');
+      expect(responseJSON.data).toBeDefined();
+      expect(responseJSON.data.addedReply).toBeDefined();
+
+      const resReply = responseJSON.data.addedReply;
+      expect(typeof resReply.id).toBe('string');
+      expect(resReply.content).toEqual('content');
+      expect(resReply.owner).toEqual(user.id);
     });
   });
 });

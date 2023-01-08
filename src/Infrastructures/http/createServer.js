@@ -77,6 +77,8 @@ const createServer = async (container) => {
         status: 'error',
         message: 'terjadi kegagalan pada server kami',
       });
+      // console.log(response.message);
+      // console.log(response.stack);
       newResponse.code(500);
       return newResponse;
     }

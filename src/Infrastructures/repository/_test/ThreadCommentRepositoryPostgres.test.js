@@ -4,7 +4,9 @@ const ThreadCommentsTableTestHelper = require('../../../../tests/ThreadCommentsT
 const pool = require('../../database/postgres/pool');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const AddNewThreadComment = require('../../../Domains/threads/entities/AddNewThreadComment');
+const AddNewThreadReplyComment = require('../../../Domains/threads/entities/AddNewThreadReplyComment');
 const NewThreadComment = require('../../../Domains/threads/entities/NewThreadComment');
+const NewThreadReplyComment = require('../../../Domains/threads/entities/NewThreadReplyComment');
 const ThreadCommentRepositoryPostgres = require('../ThreadCommentRepositoryPostgres');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
@@ -157,6 +159,73 @@ describe('The ThreadCommentRepositoryPostgres', () => {
       expect(comments).toHaveLength(3);
       const resIds = comments.map(({ id }) => id);
       expect(resIds).toStrictEqual(ids);
+    });
+  });
+
+  describe('addNewReplyComment function', () => {
+    it('should add new reply comment', async () => {
+      const comment = {
+        id: 'reply-1',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+      };
+      await ThreadCommentsTableTestHelper.addNewComment(comment);
+      const payload = new AddNewThreadReplyComment({
+        content: 'reply content',
+        userId: userTest.id,
+        threadId: thread.id,
+        commentId: comment.id,
+      });
+
+      const idGenerator = () => '111';
+      const repo = new ThreadCommentRepositoryPostgres(pool, idGenerator);
+      const newThreadReplyComment = await repo.addNewReplyComment(payload);
+
+      const replies = await ThreadCommentsTableTestHelper
+        .getThreadReplyCommentByCommentId(comment.id);
+      expect(replies).toHaveLength(1);
+      expect(replies[0].id).toBeDefined();
+      expect(replies[0].content).toEqual(payload.content);
+      expect(replies[0].owner).toEqual(payload.user_id);
+    });
+  });
+
+  describe('findCommentById function', () => {
+    it('should return null when comment not found', async () => {
+      const comment = {
+        id: 'comment-1',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+      };
+      await ThreadCommentsTableTestHelper.addNewComment(comment);
+
+      const repo = new ThreadCommentRepositoryPostgres(pool, {});
+      const commnet = await repo.findCommentById(`wrong-${comment.id}`);
+
+      expect(commnet).toBeNull();
+    });
+
+    it('should return comment when comment is found', async () => {
+      const sample = {
+        id: 'comment-1',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+      };
+      await ThreadCommentsTableTestHelper.addNewComment(sample);
+
+      const repo = new ThreadCommentRepositoryPostgres(pool, {});
+      const comment = await repo.findCommentById(`${sample.id}`);
+
+      expect(comment).not.toBeNull();
+      expect(comment).toStrictEqual({
+        id: sample.id,
+        content: sample.content,
+        threadId: sample.threadId,
+        owner: sample.userId,
+      });
     });
   });
 });

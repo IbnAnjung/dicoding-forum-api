@@ -18,6 +18,14 @@ const ThreadCommentsTableTestHelper = {
     return result.rows;
   },
 
+  async getThreadReplyCommentByCommentId(id) {
+    const result = await pool.query({
+      text: 'SELECT * FROM thread_comments WHERE comment_parent_id = $1',
+      values: [id],
+    });
+    return result.rows;
+  },
+
   async softDeleteThreadCommentById(id) {
     const now = new Date().toISOString();
     const result = await pool.query({

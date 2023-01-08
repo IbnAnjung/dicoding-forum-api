@@ -30,6 +30,26 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     });
   }
 
+  async addNewReplyComment({
+    threadId, content, userId, commentId,
+  }) {
+    const id = `reply-${this._idGenerator()}`;
+    const createdAt = new Date().toISOString();
+
+    const res = await this._pool.query({
+      text: `INSERT INTO thread_comments (id, content, thread_id, user_id, created_at, comment_parent_id)
+        VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, content, user_id`,
+      values: [id, content, threadId, userId, createdAt, commentId],
+    });
+
+    const newComment = res.rows[0];
+    return new NewThreadComment({
+      id: newComment.id,
+      content: newComment.content,
+      owner: newComment.user_id,
+    });
+  }
+
   async verifyThreadCommentAndCommentOwner({ threadCommentId, userId }) {
     const query = {
       text: `SELECT user_id 
@@ -74,6 +94,26 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     }
 
     return comments.rows;
+  }
+
+  async findCommentById(commentId) {
+    const res = await this._pool.query({
+      text: `SELECT id, thread_id, user_id, content
+        FROM thread_comments WHERE id = $1`,
+      values: [commentId],
+    });
+
+    if (!res.rowCount) {
+      return null;
+    }
+
+    const comment = res.rows[0];
+    return {
+      id: comment.id,
+      content: comment.content,
+      threadId: comment.thread_id,
+      owner: comment.user_id,
+    };
   }
 }
 
