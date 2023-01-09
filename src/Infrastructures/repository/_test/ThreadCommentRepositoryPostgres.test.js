@@ -4,9 +4,8 @@ const ThreadCommentsTableTestHelper = require('../../../../tests/ThreadCommentsT
 const pool = require('../../database/postgres/pool');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const AddNewThreadComment = require('../../../Domains/threads/entities/AddNewThreadComment');
-const AddNewThreadReplyComment = require('../../../Domains/threads/entities/AddNewThreadReplyComment');
+const AddNewThreadCommentReply = require('../../../Domains/threads/entities/AddNewThreadCommentReply');
 const NewThreadComment = require('../../../Domains/threads/entities/NewThreadComment');
-const NewThreadReplyComment = require('../../../Domains/threads/entities/NewThreadReplyComment');
 const ThreadCommentRepositoryPostgres = require('../ThreadCommentRepositoryPostgres');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
@@ -260,7 +259,7 @@ describe('The ThreadCommentRepositoryPostgres', () => {
         userId: userCommentTest.id,
       };
       await ThreadCommentsTableTestHelper.addNewComment(comment);
-      const payload = new AddNewThreadReplyComment({
+      const payload = new AddNewThreadCommentReply({
         content: 'reply content',
         userId: userTest.id,
         threadId: thread.id,

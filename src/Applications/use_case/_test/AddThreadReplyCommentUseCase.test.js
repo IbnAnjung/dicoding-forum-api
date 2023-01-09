@@ -66,7 +66,7 @@ describe('a AddThreadReplyCommentUseCase', () => {
     });
 
     await expect(useCase.execute(payload)).rejects
-      .toThrowError('ADD_NEW_THREAD_REPLY_COMMENT.THREAD_NOT_FOUND');
+      .toThrowError('ADD_NEW_THREAD_COMMENT_REPLY.THREAD_NOT_FOUND');
   });
 
   it('should throw error when comment not found', async () => {
@@ -86,6 +86,6 @@ describe('a AddThreadReplyCommentUseCase', () => {
     });
 
     await expect(useCase.execute(payload)).rejects
-      .toThrowError('ADD_NEW_THREAD_REPLY_COMMENT.THREAD_NOT_FOUND');
+      .toThrowError('ADD_NEW_THREAD_COMMENT_REPLY.THREAD_NOT_FOUND');
   });
 });

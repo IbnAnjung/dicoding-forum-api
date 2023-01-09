@@ -28,9 +28,9 @@ describe('DomainErrorTranslator', () => {
       .toStrictEqual(new InvariantError('tidak dapat membuat comment pada thread, karena properti yang di butuhkan tidak ada'));
     expect(DomainErrorTranslator.translate(new Error('NEW_THREAD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION')))
       .toStrictEqual(new InvariantError('tidak dapat membuat comment pada thread karena tipe data tidak sesuai'));
-    expect(DomainErrorTranslator.translate(new Error('ADD_NEW_THREAD_REPLY_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY')))
+    expect(DomainErrorTranslator.translate(new Error('ADD_NEW_THREAD_COMMENT_REPLY.NOT_CONTAIN_NEEDED_PROPERTY')))
       .toStrictEqual(new InvariantError('tidak dapat membuat comment pada thread, karena properti yang di butuhkan tidak ada'));
-    expect(DomainErrorTranslator.translate(new Error('ADD_NEW_THREAD_REPLY_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION')))
+    expect(DomainErrorTranslator.translate(new Error('ADD_NEW_THREAD_COMMENT_REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION')))
       .toStrictEqual(new InvariantError('tidak dapat membuat comment pada thread karena tipe data tidak sesuai'));
     expect(DomainErrorTranslator.translate(new Error('NEW_THREAD_REPLY_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY')))
       .toStrictEqual(new InvariantError('tidak dapat membuat comment pada thread, karena properti yang di butuhkan tidak ada'));
@@ -42,7 +42,7 @@ describe('DomainErrorTranslator', () => {
       .toStrictEqual(new NotFoundError('Thread Tidak ditemukan'));
     expect(DomainErrorTranslator.translate(new Error('THREAD_DETAIL.THREAD_NOT_FOUND')))
       .toStrictEqual(new NotFoundError('Thread Tidak ditemukan'));
-    expect(DomainErrorTranslator.translate(new Error('ADD_NEW_THREAD_REPLY_COMMENT.THREAD_NOT_FOUND')))
+    expect(DomainErrorTranslator.translate(new Error('ADD_NEW_THREAD_COMMENT_REPLY.THREAD_NOT_FOUND')))
       .toStrictEqual(new NotFoundError('Thread Tidak ditemukan'));
   });
 

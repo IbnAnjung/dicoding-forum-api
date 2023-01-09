@@ -1,4 +1,4 @@
-const AddNewThreadReplyComment = require('../../Domains/threads/entities/AddNewThreadReplyComment');
+const AddNewThreadCommentReply = require('../../Domains/threads/entities/AddNewThreadCommentReply');
 
 class AddThreadReplyCommentUseCase {
   constructor({
@@ -8,20 +8,20 @@ class AddThreadReplyCommentUseCase {
   }
 
   async execute(payload) {
-    const addNewThreadReplyComment = new AddNewThreadReplyComment(payload);
+    const addNewThreadCommentReply = new AddNewThreadCommentReply(payload);
     const comment = await this._threadCommentRepository
-      .findCommentById(addNewThreadReplyComment.commentId);
+      .findCommentById(addNewThreadCommentReply.commentId);
 
     if (!comment) {
-      throw new Error('ADD_NEW_THREAD_REPLY_COMMENT.THREAD_NOT_FOUND');
+      throw new Error('ADD_NEW_THREAD_COMMENT_REPLY.THREAD_NOT_FOUND');
     }
 
-    if (comment && comment.threadId !== addNewThreadReplyComment.threadId) {
-      throw new Error('ADD_NEW_THREAD_REPLY_COMMENT.THREAD_NOT_FOUND');
+    if (comment && comment.threadId !== addNewThreadCommentReply.threadId) {
+      throw new Error('ADD_NEW_THREAD_COMMENT_REPLY.THREAD_NOT_FOUND');
     }
 
     const newReplyComment = await this._threadCommentRepository
-      .addNewReplyComment(addNewThreadReplyComment);
+      .addNewReplyComment(addNewThreadCommentReply);
     return newReplyComment;
   }
 }
