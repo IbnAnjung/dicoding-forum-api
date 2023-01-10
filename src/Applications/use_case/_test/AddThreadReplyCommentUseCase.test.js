@@ -54,16 +54,14 @@ describe('a AddThreadReplyCommentUseCase', () => {
       userId: 'user-123',
     };
 
-    const newComment = new NewThreadReplyComment({
-      id: 'comment-123',
-      content: payload.content,
-      owner: 'user-123',
-      threadId: 'another-thread',
-    });
-
     const mockThreadCommentRepository = new ThreadCommentRepository();
     mockThreadCommentRepository.findCommentById = jest.fn()
-      .mockImplementation(() => Promise.resolve(newComment));
+      .mockImplementation(() => Promise.resolve(new NewThreadReplyComment({
+        id: 'comment-123',
+        content: payload.content,
+        owner: 'user-123',
+        threadId: 'another-thread',
+      })));
 
     const useCase = new AddThreadReplyCommentUseCase({
       threadCommentRepository: mockThreadCommentRepository,

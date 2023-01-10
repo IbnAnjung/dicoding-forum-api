@@ -49,19 +49,17 @@ describe('a AddThreadCommentUseCase', () => {
       userId: 'user-123',
     };
 
-    const newComment = new NewThreadComment({
-      id: 'comment-123',
-      content: payload.content,
-      owner: 'user-123',
-    });
-
     const mockThreadRepository = new ThreadRepository();
     mockThreadRepository.verifyThreadAvailability = jest.fn()
       .mockImplementation(() => Promise.resolve(false));
 
     const mockThreadCommentRepository = new ThreadCommentRepository();
     mockThreadCommentRepository.addNewComment = jest.fn()
-      .mockImplementation(() => Promise.resolve(newComment));
+      .mockImplementation(() => Promise.resolve(new NewThreadComment({
+        id: 'comment-123',
+        content: payload.content,
+        owner: 'user-123',
+      })));
 
     const useCase = new AddThreadCommentUseCase({
       threadRepository: mockThreadRepository,
