@@ -56,12 +56,58 @@ describe('GetThreadDetailUseCase', () => {
 
     const threadRepository = new ThreadRepository();
     threadRepository.getDetailThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve(thread));
+      .mockImplementation(() => Promise.resolve({
+        id: 'thread-1',
+        title: 'title',
+        body: 'body',
+        date: '2023-01-08T07:19:09.775Z',
+        username: 'angga',
+      }));
     const threadCommentRepository = new ThreadCommentRepository();
     threadCommentRepository.getCommentByThreadId = jest.fn()
-      .mockImplementation(() => Promise.resolve(comments));
+      .mockImplementation(() => Promise.resolve([
+        {
+          id: 'comments-1',
+          username: 'saputra',
+          date: '2023-01-08T07:19:09.775Z',
+          deleted: null,
+          content: 'content',
+        },
+        {
+          id: 'comments-2',
+          username: 'saputra',
+          date: '2023-01-08T07:19:09.775Z',
+          deleted: '2023-01-08T07:19:09.775Z',
+          content: 'content',
+        },
+      ]));
     threadCommentRepository.getCommentRepliesByCommentIds = jest.fn()
-      .mockImplementation(() => Promise.resolve(replies));
+      .mockImplementation(() => Promise.resolve([
+        {
+          id: 'replies-1',
+          comment: 'comments-1',
+          username: 'saputra',
+          date: '2023-01-08T07:19:09.775Z',
+          deleted: null,
+          content: 'content',
+        },
+        {
+          id: 'replies-2',
+          comment: 'comments-1',
+          username: 'saputra',
+          date: '2023-01-08T07:19:09.775Z',
+          deleted: null,
+          content: 'content',
+        },
+        {
+          id: 'replies-3',
+          comment: 'comments-2',
+          username: 'saputra',
+          date: '2023-01-08T07:19:09.775Z',
+          deleted: '2023-01-08T07:19:09.775Z',
+          content: 'content',
+        },
+      ]));
 
     const uc = new GetThreadDetailUseCase({
       threadRepository, threadCommentRepository,

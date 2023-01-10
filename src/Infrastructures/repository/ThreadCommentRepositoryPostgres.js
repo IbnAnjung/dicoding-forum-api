@@ -14,7 +14,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     threadId, content, userId,
   }) {
     const id = `comment-${this._idGenerator()}`;
-    const createdAt = new Date().toISOString();
+    const createdAt = new Date();
 
     const res = await this._pool.query({
       text: `INSERT INTO thread_comments (id, content, thread_id, user_id, created_at)
@@ -34,7 +34,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     threadId, content, userId, commentId,
   }) {
     const id = `reply-${this._idGenerator()}`;
-    const createdAt = new Date().toISOString();
+    const createdAt = new Date();
 
     const res = await this._pool.query({
       text: `INSERT INTO thread_comments (id, content, thread_id, user_id, created_at, comment_parent_id)
@@ -90,7 +90,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
   }
 
   async deleteCommentById(threadCommentId) {
-    const timestamps = new Date().toISOString();
+    const timestamps = new Date();
     await this._pool.query({
       text: `UPDATE thread_comments SET deleted_at=$1
         WHERE id = $2`,
@@ -99,7 +99,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
   }
 
   async deleteCommentReplyById(threadCommentId) {
-    const timestamps = new Date().toISOString();
+    const timestamps = new Date();
     await this._pool.query({
       text: `UPDATE thread_comments SET deleted_at=$1
         WHERE id = $2 AND comment_parent_id IS NOT NULL`,

@@ -7,10 +7,15 @@ const ThreadsTableTestHelper = {
     title = 'new thread title',
     content = 'thread content',
     userId = 'user-123',
+    createdDate = null,
   }) {
+    let date = createdDate;
+    if (!createdDate) {
+      date = new Date();
+    }
     await pool.query({
-      text: 'INSERT INTO threads (id, title, content, user_id) VALUES ($1, $2, $3, $4)',
-      values: [id, title, content, userId],
+      text: 'INSERT INTO threads (id, title, content, user_id, created_at) VALUES ($1, $2, $3, $4, $5)',
+      values: [id, title, content, userId, date],
     });
   },
 

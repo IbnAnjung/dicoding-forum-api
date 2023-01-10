@@ -14,7 +14,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     title, content, userId,
   }) {
     const id = `thread-${this._idGenerator()}`;
-    const createdAt = new Date().toISOString();
+    const createdAt = new Date();
 
     const result = await this._pool.query({
       text: `INSERT INTO threads (id, title, content, user_id, created_at) 

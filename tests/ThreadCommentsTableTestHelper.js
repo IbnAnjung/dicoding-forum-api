@@ -2,11 +2,14 @@ const pool = require('../src/Infrastructures/database/postgres/pool');
 
 const ThreadCommentsTableTestHelper = {
   async addNewComment({
-    id, content, threadId, userId, commentParentId,
+    id, content, threadId, userId, commentParentId, createdDate,
   }) {
+    const date = (createdDate) || new Date();
     await pool.query({
-      text: 'INSERT INTO thread_comments (id, content, thread_id, user_id, comment_parent_id) VALUES ($1, $2, $3, $4, $5)',
-      values: [id, content, threadId, userId, commentParentId],
+      text: `INSERT INTO thread_comments 
+        (id, content, thread_id, user_id, comment_parent_id, created_at) 
+        VALUES ($1, $2, $3, $4, $5, $6)`,
+      values: [id, content, threadId, userId, commentParentId, date],
     });
   },
 
@@ -26,8 +29,8 @@ const ThreadCommentsTableTestHelper = {
     return result.rows;
   },
 
-  async softDeleteThreadCommentById(id) {
-    const now = new Date().toISOString();
+  async softDeleteThreadCommentById(id, deletedAt = null) {
+    const now = (deletedAt) || new Date();
     const result = await pool.query({
       text: 'UPDATE thread_comments SET deleted_at = $2  WHERE id = $1',
       values: [id, now],

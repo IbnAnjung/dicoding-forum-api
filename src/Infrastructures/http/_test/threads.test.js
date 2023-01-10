@@ -33,6 +33,7 @@ describe('/threads endpoint', () => {
     title: 'title',
     content: 'content',
     userId: 'user-123',
+    createdDate: new Date(),
   };
 
   const comment = {
@@ -428,36 +429,50 @@ describe('/threads endpoint', () => {
       await UsersTableTestHelper.addUser(commentUser);
 
       await ThreadsTableTestHelper.createThread(thread);
+      const commentDates = [];
+      commentDates['comment-2'] = new Date();
       await ThreadCommentsTableTestHelper.addNewComment({
-        id: 'commnet-2',
+        id: 'comment-2',
         content: 'comment',
         threadId: thread.id,
         userId: commentUser.id,
+        creaatedDate: commentDates['comment-2'],
       });
+
+      commentDates['comment-1'] = new Date();
       await ThreadCommentsTableTestHelper.addNewComment({
-        id: 'commnet-1',
+        id: 'comment-1',
         content: 'comment',
         threadId: thread.id,
         userId: user.id,
+        creaatedDate: commentDates['comment-1'],
       });
 
+      const replyDates = [];
+      replyDates['reply-1'] = new Date();
       await ThreadCommentsTableTestHelper.addNewComment({
         id: 'reply-1',
-        commentParentId: 'commnet-2',
+        commentParentId: 'comment-2',
         content: 'comment',
         threadId: thread.id,
         userId: user.id,
-      });
-      await ThreadCommentsTableTestHelper.addNewComment({
-        id: 'reply-2',
-        commentParentId: 'commnet-2',
-        content: 'comment',
-        threadId: thread.id,
-        userId: user.id,
+        createdDate: replyDates['reply-1'],
       });
 
-      await ThreadCommentsTableTestHelper.softDeleteThreadCommentById('commnet-1');
-      await ThreadCommentsTableTestHelper.softDeleteThreadCommentById('reply-1');
+      replyDates['reply-2'] = new Date();
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'reply-2',
+        commentParentId: 'comment-2',
+        content: 'comment',
+        threadId: thread.id,
+        userId: user.id,
+        createdDate: replyDates['reply-2'],
+      });
+
+      const deletedCommentDate = new Date();
+      const deletedReplyDate = new Date();
+      await ThreadCommentsTableTestHelper.softDeleteThreadCommentById('comment-1', deletedCommentDate);
+      await ThreadCommentsTableTestHelper.softDeleteThreadCommentById('reply-1', deletedReplyDate);
 
       const server = await createServer(container);
       const response = await server.inject({
@@ -478,24 +493,28 @@ describe('/threads endpoint', () => {
       expect(resThread.username).toEqual(user.username);
 
       const resComment1 = resThread.comments[0];
-      expect(resComment1.id).toEqual('commnet-2');
+      expect(resComment1.id).toEqual('comment-2');
       expect(resComment1.username).toEqual(commentUser.username);
       expect(typeof resComment1.date).toBe('string');
+      expect(resComment1.date).toEqual(new Date(commentDates['comment-2']).toISOString());
       expect(resComment1.content).toBe('comment');
       expect(resComment1.replies).toHaveLength(2);
       expect(resComment1.replies[0].id).toEqual('reply-1');
       expect(resComment1.replies[0].username).toEqual(user.username);
       expect(typeof resComment1.replies[0].date).toBe('string');
+      expect(resComment1.replies[0].date).toEqual(new Date(replyDates['reply-1']).toISOString());
       expect(resComment1.replies[0].content).toEqual('**balasan telah dihapus**');
       expect(resComment1.replies[1].id).toEqual('reply-2');
       expect(resComment1.replies[1].username).toEqual(user.username);
       expect(typeof resComment1.replies[1].date).toBe('string');
+      expect(resComment1.replies[1].date).toEqual(new Date(replyDates['reply-2']).toISOString());
       expect(resComment1.replies[1].content).toEqual('comment');
 
       const resComment2 = resThread.comments[1];
-      expect(resComment2.id).toEqual('commnet-1');
+      expect(resComment2.id).toEqual('comment-1');
       expect(resComment2.username).toEqual(user.username);
       expect(typeof resComment2.date).toBe('string');
+      expect(resComment2.date).toEqual(new Date(commentDates['comment-1']).toISOString());
       expect(resComment2.content).toEqual('**komentar telah dihapus**');
       expect(resComment2.replies).toHaveLength(0);
     });

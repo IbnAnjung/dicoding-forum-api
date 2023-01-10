@@ -28,7 +28,11 @@ describe('a AddThreadReplyCommentUseCase', () => {
         commentId: 'comment-123',
       }));
     mockThreadCommentRepository.addNewReplyComment = jest.fn()
-      .mockImplementation(() => Promise.resolve(newReplyComment));
+      .mockImplementation(() => Promise.resolve(new NewThreadReplyComment({
+        id: 'reply-123',
+        content: payload.content,
+        owner: 'user-123',
+      })));
     const useCase = new AddThreadReplyCommentUseCase({
       threadCommentRepository: mockThreadCommentRepository,
     });

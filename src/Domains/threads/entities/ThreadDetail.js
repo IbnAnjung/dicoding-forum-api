@@ -17,6 +17,10 @@ class ThreadDetail {
       throw new Error('THREAD_DETAIL.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
+    if (!(new Date(date).getTime() > 0)) {
+      throw new Error('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
+    }
+
     if (typeof id !== 'string'
       || typeof title !== 'string'
       || typeof body !== 'string'
@@ -53,10 +57,6 @@ class ThreadDetail {
         });
       }
     });
-
-    if (!(new Date(date).getTime() > 0)) {
-      throw new Error('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
-    }
   }
 }
 

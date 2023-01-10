@@ -136,7 +136,7 @@ describe('The ThreadCommentRepositoryPostgres', () => {
         threadCommentId: 'comment-123',
         replyId: 'reply-123',
         userId: userCommentTest.id,
-      })).resolves.not.toThrowError();
+      })).resolves.not.toThrowError(NotFoundError);
     });
 
     it('should throw Authentication error when userId not equal to comment owner', async () => {
@@ -223,30 +223,43 @@ describe('The ThreadCommentRepositoryPostgres', () => {
 
   describe('getCommentByThreadId function', () => {
     it('should persist get comments by ids', async () => {
-      const ids = ['comments-1', 'comments-2', 'comments-3'];
+      const ids = ['comments-1', 'comments-2'];
+      const dates = [];
       // eslint-disable-next-line no-restricted-syntax
       for (const id of ids) {
+        dates[id] = new Date();
         await ThreadCommentsTableTestHelper.addNewComment({
           id,
           content: 'content',
           threadId: thread.id,
           userId: userCommentTest.id,
+          createdDate: dates[id],
         });
       }
 
-      await ThreadCommentsTableTestHelper.addNewComment({
-        id: 'reply-1',
-        commentParentId: 'comments-1',
-        content: 'content',
-        threadId: thread.id,
-        userId: userCommentTest.id,
-      });
+      const deleteDate = new Date();
+      ThreadCommentsTableTestHelper.softDeleteThreadCommentById(ids[1], deleteDate);
 
       const repo = new ThreadCommentRepositoryPostgres(pool, {});
       const comments = await repo.getCommentByThreadId(thread.id);
-      expect(comments).toHaveLength(3);
-      const resIds = comments.map(({ id }) => id);
-      expect(resIds).toStrictEqual(ids);
+      expect(comments).toHaveLength(2);
+
+      expect(typeof comments[0]).toBe('object');
+      expect(comments[0].id).toEqual('comments-1');
+      expect(comments[0].username).toEqual(userCommentTest.username);
+      expect(comments[0].date).toBeInstanceOf(Date);
+      expect(comments[0].date).toEqual(dates[comments[0].id]);
+      expect(comments[0].deleted).toEqual(null);
+      expect(comments[0].content).toEqual('content');
+
+      expect(typeof comments[1]).toBe('object');
+      expect(comments[1].id).toEqual('comments-2');
+      expect(comments[1].username).toEqual(userCommentTest.username);
+      expect(comments[1].date).toBeInstanceOf(Date);
+      expect(comments[1].date).toEqual(dates[comments[1].id]);
+      expect(comments[1].deleted).toBeInstanceOf(Date);
+      expect(comments[1].deleted).toEqual(deleteDate);
+      expect(comments[1].content).toEqual('content');
     });
   });
 

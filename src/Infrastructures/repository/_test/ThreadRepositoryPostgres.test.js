@@ -29,10 +29,12 @@ describe('ThreadRepositoryPostgres', () => {
 
   describe('CreateThread function', () => {
     it('should persist add and return new thread', async () => {
+      const createdDate = new Date();
       const createThread = new CreateThread({
         title: 'title',
         content: 'content',
         userId: userTest.id,
+        createdDate,
       });
 
       const fakeIdGenerator = () => '123'; // stub!
@@ -49,6 +51,7 @@ describe('ThreadRepositoryPostgres', () => {
       expect(thread).toHaveLength(1);
       expect(thread[0].id).toEqual(newThread.id);
       expect(thread[0].title).toEqual(newThread.title);
+      expect(thread[0].user_id).toEqual(newThread.owner);
       expect(thread[0].user_id).toEqual(newThread.owner);
     });
   });
@@ -82,19 +85,22 @@ describe('ThreadRepositoryPostgres', () => {
 
   describe('getDetailThreadById function', () => {
     it('should presist return detail of thread', async () => {
+      const createdDate = new Date();
       await ThreadsTableTestHelper.createThread({
-        id: 'thread-123',
+        id: 'thread-12345',
         title: 'new thread title',
         content: 'thread content',
         userId: userTest.id,
+        createdDate,
       });
 
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
-      const thread = await threadRepositoryPostgres.getDetailThreadById('thread-123');
-      expect(thread.id).toEqual('thread-123');
+      const thread = await threadRepositoryPostgres.getDetailThreadById('thread-12345');
+      expect(thread.id).toEqual('thread-12345');
       expect(thread.title).toEqual('new thread title');
       expect(thread.body).toEqual('thread content');
       expect(thread.date).toBeInstanceOf(Date);
+      expect(thread.date).toEqual(createdDate);
       expect(thread.username).toEqual(userTest.username);
     });
   });
