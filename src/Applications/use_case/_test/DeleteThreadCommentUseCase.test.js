@@ -4,19 +4,14 @@ const NewThread = require('../../../Domains/threads/entities/NewThread');
 const DeleteThreadCommentUseCase = require('../DeleteThreadCommentUseCase');
 
 describe('DeleteThreadCommentUseCase', () => {
-  it('should orchestratin the delete comment yser action correctly', async () => {
+  it('should orchestratin the delete comment user action correctly', async () => {
     const userId = 'user-123';
     const threadId = 'thread-123';
     const threadCommentId = 'comments-123';
 
-    const thread = new NewThread({
-      id: threadId,
-      title: 'title',
-      owner: 'user-thread-owner',
-    });
     const threadRepository = new ThreadRepository();
-    threadRepository.findThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve(thread));
+    threadRepository.verifyThreadAvailability = jest.fn()
+      .mockImplementation(() => Promise.resolve(true));
 
     const threadCommentRepository = new ThreadCommentRepository();
     threadCommentRepository.verifyThreadCommentAndCommentOwner = jest.fn()
@@ -34,11 +29,33 @@ describe('DeleteThreadCommentUseCase', () => {
       threadCommentId,
     });
 
-    expect(threadRepository.findThreadById).toBeCalledWith(threadId);
+    expect(threadRepository.verifyThreadAvailability).toBeCalledWith(threadId);
     expect(threadCommentRepository.verifyThreadCommentAndCommentOwner).toBeCalledWith({
       userId,
       threadCommentId,
     });
     expect(threadCommentRepository.deleteCommentById).toBeCalledWith(threadCommentId);
+  });
+
+  it('should throw error when thread not found', async () => {
+    const userId = 'user-123';
+    const threadId = 'thread-123';
+    const threadCommentId = 'comments-123';
+
+    const threadRepository = new ThreadRepository();
+    threadRepository.verifyThreadAvailability = jest.fn()
+      .mockImplementation(() => Promise.resolve(false));
+
+    const threadCommentRepository = new ThreadCommentRepository();
+
+    const useCase = new DeleteThreadCommentUseCase({
+      threadRepository, threadCommentRepository,
+    });
+
+    await expect(useCase.execute({
+      threadId,
+      userId,
+      threadCommentId,
+    })).rejects.toThrowError('THREAD_COMMENT.THREAD_NOT_FOUND');
   });
 });

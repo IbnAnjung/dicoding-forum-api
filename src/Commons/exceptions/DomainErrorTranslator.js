@@ -31,7 +31,7 @@ DomainErrorTranslator._directories = {
   'ADD_NEW_THREAD_COMMENT_REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat membuat comment pada thread karena tipe data tidak sesuai'),
   'NEW_THREAD_REPLY_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('tidak dapat membuat comment pada thread, karena properti yang di butuhkan tidak ada'),
   'NEW_THREAD_REPLY_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat membuat comment pada thread karena tipe data tidak sesuai'),
-  'DELETE_THREAD_COMMENT.THREAD_NOT_FOUND': new NotFoundError('Thread Tidak ditemukan'),
+  'THREAD_COMMENT.THREAD_NOT_FOUND': new NotFoundError('Thread Tidak ditemukan'),
   'THREAD_DETAIL.THREAD_NOT_FOUND': new NotFoundError('Thread Tidak ditemukan'),
   'ADD_NEW_THREAD_COMMENT_REPLY.THREAD_NOT_FOUND': new NotFoundError('Thread Tidak ditemukan'),
   'THREAD_COMMENT_REPLY.THREAD_NOT_FOUND': new NotFoundError('Thread Tidak ditemukan'),
