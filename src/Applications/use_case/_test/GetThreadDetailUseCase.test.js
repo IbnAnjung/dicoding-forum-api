@@ -103,4 +103,25 @@ describe('GetThreadDetailUseCase', () => {
     expect(threadDetail.comments[1].replies[0].date).toEqual(replies[2].date);
     expect(threadDetail.comments[1].replies[0].content).toEqual('**balasan telah dihapus**');
   });
+
+  it('should show error when thread not found', async () => {
+    const thread = {
+      id: 'thread-1',
+      title: 'title',
+      body: 'body',
+      date: '2023-01-08T07:19:09.775Z',
+      username: 'angga',
+    };
+
+    const threadRepository = new ThreadRepository();
+    threadRepository.getDetailThreadById = jest.fn()
+      .mockImplementation(() => Promise.resolve(null));
+    const threadCommentRepository = new ThreadCommentRepository();
+
+    const uc = new GetThreadDetailUseCase({
+      threadRepository, threadCommentRepository,
+    });
+    await expect(uc.execute({ threadId: thread.id }))
+      .rejects.toThrowError('THREAD_DETAIL.THREAD_NOT_FOUND');
+  });
 });
