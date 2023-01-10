@@ -18,15 +18,9 @@ describe('a AddThreadCommentUseCase', () => {
       owner: 'user-123',
     });
 
-    const thread = new NewThread({
-      id: 'thread-123',
-      title: 'thread',
-      owner: 'user-123',
-    });
-
     const mockThreadRepository = new ThreadRepository();
-    mockThreadRepository.findThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve(thread));
+    mockThreadRepository.verifyThreadAvailability = jest.fn()
+      .mockImplementation(() => Promise.resolve(true));
 
     const mockThreadCommentRepository = new ThreadCommentRepository();
     mockThreadCommentRepository.addNewComment = jest.fn()
@@ -39,9 +33,13 @@ describe('a AddThreadCommentUseCase', () => {
 
     const newThreadComment = await useCase.execute(payload);
 
-    expect(mockThreadRepository.findThreadById).toBeCalledWith(payload.threadId);
+    expect(mockThreadRepository.verifyThreadAvailability).toBeCalledWith(payload.threadId);
     expect(mockThreadCommentRepository.addNewComment).toBeCalledWith(payload);
-    expect(newThreadComment).toStrictEqual(newComment);
+    expect(newThreadComment).toStrictEqual(new NewThreadComment({
+      id: 'comment-123',
+      content: payload.content,
+      owner: 'user-123',
+    }));
   });
 
   it('should throw error when threadId not found', async () => {
@@ -58,8 +56,8 @@ describe('a AddThreadCommentUseCase', () => {
     });
 
     const mockThreadRepository = new ThreadRepository();
-    mockThreadRepository.findThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve(null));
+    mockThreadRepository.verifyThreadAvailability = jest.fn()
+      .mockImplementation(() => Promise.resolve(false));
 
     const mockThreadCommentRepository = new ThreadCommentRepository();
     mockThreadCommentRepository.addNewComment = jest.fn()

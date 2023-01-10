@@ -98,4 +98,22 @@ describe('ThreadRepositoryPostgres', () => {
       expect(thread.username).toEqual(userTest.username);
     });
   });
+
+  describe('verifyThreadAvailability function', () => {
+    it('should presist return bool is thread available or not', async () => {
+      await ThreadsTableTestHelper.createThread({
+        id: 'thread-123',
+        title: 'new thread title',
+        content: 'thread content',
+        userId: userTest.id,
+      });
+
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+      const availableThread = await threadRepositoryPostgres.verifyThreadAvailability('thread-123');
+      const unavailableThread = await threadRepositoryPostgres.verifyThreadAvailability('unavilable-thread-id');
+
+      expect(availableThread).toEqual(true);
+      expect(unavailableThread).toEqual(false);
+    });
+  });
 });

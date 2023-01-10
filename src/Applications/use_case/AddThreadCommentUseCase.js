@@ -10,7 +10,8 @@ class AddThreadCommentUseCase {
 
   async execute(payload) {
     const addNewThreadComment = new AddNewThreadComment(payload);
-    const thread = await this._threadRepository.findThreadById(addNewThreadComment.threadId);
+    const thread = await this._threadRepository
+      .verifyThreadAvailability(addNewThreadComment.threadId);
 
     if (!thread) {
       throw new Error('ADD_NEW_THREAD_COMMENT.THREAD_NOT_FOUND');
