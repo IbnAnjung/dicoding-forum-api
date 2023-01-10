@@ -9,10 +9,10 @@ class DeleteThreadCommentReplyUseCase {
   async execute({
     userId, threadId, threadCommentId, threadCommentReplyId,
   }) {
-    const thread = await this._threadRepository.findThreadById(threadId);
+    const thread = await this._threadRepository.verifyThreadAvailability(threadId);
 
     if (!thread) {
-      throw new Error('DELETE_THREAD_COMMENT.THREAD_NOT_FOUND');
+      throw new Error('THREAD_COMMENT_REPLY.THREAD_NOT_FOUND');
     }
 
     await this._threadCommentRepository.verifyThreadCommentReplyAndCommentReplyOwner({

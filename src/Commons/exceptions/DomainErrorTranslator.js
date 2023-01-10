@@ -34,6 +34,7 @@ DomainErrorTranslator._directories = {
   'DELETE_THREAD_COMMENT.THREAD_NOT_FOUND': new NotFoundError('Thread Tidak ditemukan'),
   'THREAD_DETAIL.THREAD_NOT_FOUND': new NotFoundError('Thread Tidak ditemukan'),
   'ADD_NEW_THREAD_COMMENT_REPLY.THREAD_NOT_FOUND': new NotFoundError('Thread Tidak ditemukan'),
+  'THREAD_COMMENT_REPLY.THREAD_NOT_FOUND': new NotFoundError('Thread Tidak ditemukan'),
 };
 
 module.exports = DomainErrorTranslator;
