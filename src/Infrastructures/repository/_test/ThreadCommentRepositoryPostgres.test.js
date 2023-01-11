@@ -176,6 +176,43 @@ describe('The ThreadCommentRepositoryPostgres', () => {
     });
   });
 
+  describe('verifyThreadCommentAvailability function', () => {
+    it('should not throw error when threadComment is exists', async () => {
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'comment-123',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+      });
+      const repo = new ThreadCommentRepositoryPostgres(pool, {});
+      await expect(repo.verifyThreadCommentAvailabilty({
+        threadCommentId: 'comment-123',
+        threadId: thread.id,
+      })).resolves.not.toThrowError(NotFoundError);
+    });
+
+    it('should throw NotFound error when not exists', async () => {
+      await ThreadCommentsTableTestHelper.addNewComment({
+        id: 'reply-123',
+        content: 'content',
+        threadId: thread.id,
+        userId: userCommentTest.id,
+        commentParentId: 'comment-123',
+      });
+
+      const repo = new ThreadCommentRepositoryPostgres(pool, {});
+      await expect(repo.verifyThreadCommentAvailabilty({
+        threadCommentId: 'comment-123',
+        threadId: `wrong-${thread.id}`,
+      })).rejects.toThrowError(NotFoundError);
+
+      await expect(repo.verifyThreadCommentAvailabilty({
+        threadCommentId: 'wrong-comment-123',
+        threadId: thread.id,
+      })).rejects.toThrowError(NotFoundError);
+    });
+  });
+
   describe('deleteCommentById function', () => {
     it('should persist soft deleted comment by fill deleted_at', async () => {
       await ThreadCommentsTableTestHelper.addNewComment({

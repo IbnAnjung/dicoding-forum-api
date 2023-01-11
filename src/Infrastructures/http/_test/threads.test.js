@@ -546,7 +546,7 @@ describe('/threads endpoint', () => {
       expect(typeof responseJSON.message).toBe('string');
     });
 
-    it('should response 404 when threadId not match with comment threadId', async () => {
+    it('should response 404 when threadId not found', async () => {
       await UsersTableTestHelper.addUser(user);
       await UsersTableTestHelper.addUser(commentUser);
       await ThreadsTableTestHelper.createThread(thread);

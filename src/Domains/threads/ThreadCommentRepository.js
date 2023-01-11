@@ -15,6 +15,10 @@ class ThreadCommentRepository {
     throw new Error('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
 
+  async verifyThreadCommentAvailabilty({ threadCommentId, threadId }) {
+    throw new Error('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+  }
+
   async deleteCommentById(threadCommentId) {
     throw new Error('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }

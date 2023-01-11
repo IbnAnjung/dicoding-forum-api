@@ -68,6 +68,22 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     }
   }
 
+  async verifyThreadCommentAvailabilty({ threadCommentId, threadId }) {
+    const query = {
+      text: `SELECT id 
+        FROM thread_comments 
+        WHERE id = $1
+          AND thread_id = $2 `,
+      values: [threadCommentId, threadId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Comment tidak ditemukan');
+    }
+  }
+
   async verifyThreadCommentReplyAndCommentReplyOwner({
     replyId, threadCommentId, userId,
   }) {
