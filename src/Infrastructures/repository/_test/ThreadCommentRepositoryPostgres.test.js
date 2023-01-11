@@ -185,24 +185,6 @@ describe('The ThreadCommentRepositoryPostgres', () => {
         userId: userCommentTest.id,
       });
 
-      const repo = new ThreadCommentRepositoryPostgres(pool);
-      await repo.deleteCommentById('comments-123');
-      const res = await ThreadCommentsTableTestHelper.findThreadCommentById('comments-123');
-      const comment = res[0];
-
-      expect(comment.deleted_at).not.toBeNull();
-    });
-  });
-
-  describe('deleteCommentById function', () => {
-    it('should persist soft deleted comment by fill deleted_at', async () => {
-      await ThreadCommentsTableTestHelper.addNewComment({
-        id: 'comments-123',
-        content: 'content',
-        threadId: thread.id,
-        userId: userCommentTest.id,
-      });
-
       await ThreadCommentsTableTestHelper.addNewComment({
         id: 'reply-123',
         content: 'content',

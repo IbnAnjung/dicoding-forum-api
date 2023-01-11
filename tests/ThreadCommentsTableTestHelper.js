@@ -47,7 +47,7 @@ const ThreadCommentsTableTestHelper = {
   },
 
   async cleanTable() {
-    await pool.query('DELETE FROM threads where 1=1');
+    await pool.query('DELETE FROM thread_comments where 1=1');
   },
 };
 

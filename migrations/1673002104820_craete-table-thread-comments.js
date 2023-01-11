@@ -6,7 +6,7 @@ exports.up = (pgm) => {
   pgm.createTable('thread_comments', {
     id: {
       type: 'VARCHAR(50)',
-      primary: true,
+      primaryKey: true,
     },
     content: {
       type: 'TEXT',
