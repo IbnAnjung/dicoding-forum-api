@@ -180,6 +180,23 @@ describe('a ThreadDetail entities', () => {
         },
       ],
     };
+
+    const payloadInvalidRepliesObject = {
+      id: '123',
+      title: 'title',
+      body: 'thread body',
+      username: 'angga',
+      date: '2022-01-02',
+      comments: [
+        {
+          id: 'comment-2',
+          username: 'comment user',
+          date: '2022-01-02',
+          content: 'content',
+          replies: {},
+        },
+      ],
+    };
     expect(() => new ThreadDetail(payloadInCompleteOnThread)).toThrowError('THREAD_DETAIL.NOT_CONTAIN_NEEDED_PROPERTY');
     expect(() => new ThreadDetail(payloadInvalidOnThread)).toThrowError('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
     expect(() => new ThreadDetail(payloadInvalidOnThreadDate)).toThrowError('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
@@ -189,6 +206,7 @@ describe('a ThreadDetail entities', () => {
     expect(() => new ThreadDetail(payloadInvalidOnCommentObject)).toThrowError('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
     expect(() => new ThreadDetail(payloadInvalidOnCommentObjectDate)).toThrowError('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
 
+    expect(() => new ThreadDetail(payloadInvalidRepliesObject)).toThrowError('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
     expect(() => new ThreadDetail(payloadInCompleteOnReplies)).toThrowError('THREAD_DETAIL.NOT_CONTAIN_NEEDED_PROPERTY');
     expect(() => new ThreadDetail(payloadInvalidOnReplies)).toThrowError('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
     expect(() => new ThreadDetail(payloadInvalidOnRepliesDate)).toThrowError('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');

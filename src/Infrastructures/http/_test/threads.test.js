@@ -490,6 +490,7 @@ describe('/threads endpoint', () => {
       expect(resThread.title).toEqual(thread.title);
       expect(resThread.body).toEqual(thread.content);
       expect(typeof resThread.date).toBe('string');
+      expect(resThread.date).toEqual(new Date(thread.createdDate).toISOString());
       expect(resThread.username).toEqual(user.username);
 
       const resComment1 = resThread.comments[0];

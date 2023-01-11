@@ -51,11 +51,13 @@ class ThreadDetail {
 
     comments.forEach((comment) => {
       validateComment(comment);
-      if (Array.isArray(comment.replies)) {
-        comment.replies.forEach((reply) => {
-          validateComment(reply);
-        });
+      if (!Array.isArray(comment.replies)) {
+        throw new Error('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
       }
+
+      comment.replies.forEach((reply) => {
+        validateComment(reply);
+      });
     });
   }
 }
