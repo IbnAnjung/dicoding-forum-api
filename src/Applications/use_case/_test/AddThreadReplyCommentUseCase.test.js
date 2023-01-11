@@ -1,8 +1,6 @@
-const NewThread = require('../../../Domains/threads/entities/NewThread');
 const NewThreadReplyComment = require('../../../Domains/threads/entities/NewThreadReplyComment');
 const ThreadCommentReplyRepository = require('../../../Domains/threads/ThreadCommentReplyRepository');
 const ThreadCommentRepository = require('../../../Domains/threads/ThreadCommentRepository');
-const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const AddThreadReplyCommentUseCase = require('../AddThreadReplyCommentUseCase');
 
 describe('a AddThreadReplyCommentUseCase', () => {

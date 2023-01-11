@@ -1,4 +1,3 @@
-const CreateThread = require('../../Domains/threads/entities/CreateThread');
 const NewThread = require('../../Domains/threads/entities/NewThread');
 const Thread = require('../../Domains/threads/entities/Thread');
 const ThreadRepository = require('../../Domains/threads/ThreadRepository');

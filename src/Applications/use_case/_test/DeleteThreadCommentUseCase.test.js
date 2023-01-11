@@ -1,6 +1,5 @@
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const ThreadCommentRepository = require('../../../Domains/threads/ThreadCommentRepository');
-const NewThread = require('../../../Domains/threads/entities/NewThread');
 const DeleteThreadCommentUseCase = require('../DeleteThreadCommentUseCase');
 
 describe('DeleteThreadCommentUseCase', () => {

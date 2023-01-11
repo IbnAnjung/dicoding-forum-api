@@ -1,5 +1,4 @@
 const pool = require('../src/Infrastructures/database/postgres/pool');
-const { cleanTable } = require('./UsersTableTestHelper');
 
 const ThreadsTableTestHelper = {
   async createThread({

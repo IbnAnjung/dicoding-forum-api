@@ -1,7 +1,5 @@
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
-const ThreadCommentRepository = require('../../../Domains/threads/ThreadCommentRepository');
 const DeleteThreadCommentReplyUseCase = require('../DeleteThreadCommentReplyUseCase');
-const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const ThreadCommentReplyRepository = require('../../../Domains/threads/ThreadCommentReplyRepository');
 
 describe('DeleteThreadCommentReplyUseCase', () => {

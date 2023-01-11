@@ -1,5 +1,3 @@
-const UserLogin = require('../../users/entities/UserLogin');
-
 class CreateThread {
   constructor(payload) {
     this._verifyPayload(payload);
