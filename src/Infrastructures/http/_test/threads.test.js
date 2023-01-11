@@ -450,9 +450,9 @@ describe('/threads endpoint', () => {
 
       const replyDates = [];
       replyDates['reply-1'] = new Date();
-      await ThreadCommentsTableTestHelper.addNewComment({
+      await ThreadCommentRepliesTableTestHelper.addNewCommentReply({
         id: 'reply-1',
-        commentParentId: 'comment-2',
+        threadCommentId: 'comment-2',
         content: 'comment',
         threadId: thread.id,
         userId: user.id,
@@ -460,9 +460,9 @@ describe('/threads endpoint', () => {
       });
 
       replyDates['reply-2'] = new Date();
-      await ThreadCommentsTableTestHelper.addNewComment({
+      await ThreadCommentRepliesTableTestHelper.addNewCommentReply({
         id: 'reply-2',
-        commentParentId: 'comment-2',
+        threadCommentId: 'comment-2',
         content: 'comment',
         threadId: thread.id,
         userId: user.id,
@@ -472,7 +472,7 @@ describe('/threads endpoint', () => {
       const deletedCommentDate = new Date();
       const deletedReplyDate = new Date();
       await ThreadCommentsTableTestHelper.softDeleteThreadCommentById('comment-1', deletedCommentDate);
-      await ThreadCommentsTableTestHelper.softDeleteThreadCommentById('reply-1', deletedReplyDate);
+      await ThreadCommentRepliesTableTestHelper.softDeleteThreadCommentById('reply-1', deletedReplyDate);
 
       const server = await createServer(container);
       const response = await server.inject({

@@ -1,8 +1,9 @@
 /* eslint-disable no-param-reassign */
 class GetThreadDetailUseCase {
-  constructor({ threadRepository, threadCommentRepository }) {
+  constructor({ threadRepository, threadCommentRepository, threadCommentReplyRepository }) {
     this._threadRepository = threadRepository;
     this._threadCommentRepository = threadCommentRepository;
+    this._threadCommentReplyRepository = threadCommentReplyRepository;
   }
 
   async execute({ threadId }) {
@@ -18,7 +19,7 @@ class GetThreadDetailUseCase {
       newComment.replies = [];
       commentByIds[comment.id] = newComment;
     });
-    const replies = await this._threadCommentRepository
+    const replies = await this._threadCommentReplyRepository
       .getCommentRepliesByCommentIds(comments.map((comment) => comment.id));
     replies.forEach((reply) => {
       const newReply = reply;

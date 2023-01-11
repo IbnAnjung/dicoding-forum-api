@@ -178,6 +178,10 @@ container.register([
           name: 'threadCommentRepository',
           internal: ThreadCommentRepository.name,
         },
+        {
+          name: 'threadCommentReplyRepository',
+          internal: ThreadCommentReplyRepository.name,
+        },
       ],
     },
   },

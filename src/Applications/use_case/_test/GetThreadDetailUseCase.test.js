@@ -1,4 +1,5 @@
 const ThreadCommentRepository = require('../../../Domains/threads/ThreadCommentRepository');
+const ThreadCommentReplyRepository = require('../../../Domains/threads/ThreadCommentReplyRepository');
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const GetThreadDetailUseCase = require('../GetThreadDetailUseCase');
 
@@ -81,7 +82,8 @@ describe('GetThreadDetailUseCase', () => {
           content: 'content',
         },
       ]));
-    threadCommentRepository.getCommentRepliesByCommentIds = jest.fn()
+    const threadCommentReplyRepository = new ThreadCommentReplyRepository();
+    threadCommentReplyRepository.getCommentRepliesByCommentIds = jest.fn()
       .mockImplementation(() => Promise.resolve([
         {
           id: 'replies-1',
@@ -110,13 +112,13 @@ describe('GetThreadDetailUseCase', () => {
       ]));
 
     const uc = new GetThreadDetailUseCase({
-      threadRepository, threadCommentRepository,
+      threadRepository, threadCommentRepository, threadCommentReplyRepository,
     });
     const threadDetail = await uc.execute({ threadId: thread.id });
 
     expect(threadRepository.getDetailThreadById).toBeCalledWith(thread.id);
     expect(threadCommentRepository.getCommentByThreadId).toBeCalledWith(thread.id);
-    expect(threadCommentRepository.getCommentRepliesByCommentIds)
+    expect(threadCommentReplyRepository.getCommentRepliesByCommentIds)
       .toBeCalledWith(comments.map((comment) => comment.id));
 
     expect(threadDetail.id).toEqual(thread.id);
