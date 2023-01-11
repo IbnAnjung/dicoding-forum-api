@@ -1,9 +1,9 @@
 class DeleteThreadCommentReplyUseCase {
   constructor({
-    threadRepository, threadCommentRepository,
+    threadRepository, threadCommentReplyRepository,
   }) {
     this._threadRepository = threadRepository;
-    this._threadCommentRepository = threadCommentRepository;
+    this._threadCommentReplyRepository = threadCommentReplyRepository;
   }
 
   async execute({
@@ -15,11 +15,11 @@ class DeleteThreadCommentReplyUseCase {
       throw new Error('THREAD_COMMENT_REPLY.THREAD_NOT_FOUND');
     }
 
-    await this._threadCommentRepository.verifyThreadCommentReplyAndCommentReplyOwner({
+    await this._threadCommentReplyRepository.verifyThreadCommentReplyAndCommentReplyOwner({
       userId, threadCommentId, replyId: threadCommentReplyId,
     });
 
-    await this._threadCommentRepository.deleteCommentReplyById(threadCommentReplyId);
+    await this._threadCommentReplyRepository.deleteCommentReplyById(threadCommentReplyId);
   }
 }
 

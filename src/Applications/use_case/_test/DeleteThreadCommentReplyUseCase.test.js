@@ -2,6 +2,7 @@ const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const ThreadCommentRepository = require('../../../Domains/threads/ThreadCommentRepository');
 const DeleteThreadCommentReplyUseCase = require('../DeleteThreadCommentReplyUseCase');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
+const ThreadCommentReplyRepository = require('../../../Domains/threads/ThreadCommentReplyRepository');
 
 describe('DeleteThreadCommentReplyUseCase', () => {
   it('should orchestratin the delete comment user action correctly', async () => {
@@ -14,14 +15,14 @@ describe('DeleteThreadCommentReplyUseCase', () => {
     threadRepository.verifyThreadAvailability = jest.fn()
       .mockImplementation(() => Promise.resolve(true));
 
-    const threadCommentRepository = new ThreadCommentRepository();
-    threadCommentRepository.verifyThreadCommentReplyAndCommentReplyOwner = jest.fn()
+    const threadCommentReplyRepository = new ThreadCommentReplyRepository();
+    threadCommentReplyRepository.verifyThreadCommentReplyAndCommentReplyOwner = jest.fn()
       .mockImplementation(() => Promise.resolve());
-    threadCommentRepository.deleteCommentReplyById = jest.fn()
+    threadCommentReplyRepository.deleteCommentReplyById = jest.fn()
       .mockImplementation(() => Promise.resolve());
 
     const useCase = new DeleteThreadCommentReplyUseCase({
-      threadRepository, threadCommentRepository,
+      threadRepository, threadCommentReplyRepository,
     });
 
     await useCase.execute({
@@ -32,12 +33,14 @@ describe('DeleteThreadCommentReplyUseCase', () => {
     });
 
     expect(threadRepository.verifyThreadAvailability).toBeCalledWith(threadId);
-    expect(threadCommentRepository.verifyThreadCommentReplyAndCommentReplyOwner).toBeCalledWith({
-      userId,
-      threadCommentId,
-      replyId: threadCommentReplyId,
-    });
-    expect(threadCommentRepository.deleteCommentReplyById).toBeCalledWith(threadCommentReplyId);
+    expect(threadCommentReplyRepository.verifyThreadCommentReplyAndCommentReplyOwner)
+      .toBeCalledWith({
+        userId,
+        threadCommentId,
+        replyId: threadCommentReplyId,
+      });
+    expect(threadCommentReplyRepository.deleteCommentReplyById)
+      .toBeCalledWith(threadCommentReplyId);
   });
 
   it('should throw error when threadId not found', async () => {
@@ -50,11 +53,11 @@ describe('DeleteThreadCommentReplyUseCase', () => {
     mockThreadRepository.verifyThreadAvailability = jest.fn()
       .mockImplementation(() => Promise.resolve(false));
 
-    const mockThreadCommentRepository = new ThreadCommentRepository();
+    const mockThreadCommentReplyRepository = new ThreadCommentReplyRepository();
 
     const useCase = new DeleteThreadCommentReplyUseCase({
       threadRepository: mockThreadRepository,
-      threadCommentRepository: mockThreadCommentRepository,
+      threadCommentReplyRepository: mockThreadCommentReplyRepository,
     });
 
     await expect(useCase.execute({

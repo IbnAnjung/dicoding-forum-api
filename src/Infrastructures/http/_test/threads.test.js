@@ -3,6 +3,7 @@ const AuthenticationsTableTestHelper = require('../../../../tests/Authentication
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const ThreadCommentsTableTestHelper = require('../../../../tests/ThreadCommentsTableTestHelper');
+const ThreadCommentRepliesTableTestHelper = require('../../../../tests/ThreadCommentRepliesTableTestHelper');
 const pool = require('../../database/postgres/pool');
 const createServer = require('../createServer');
 const container = require('../../container');
@@ -45,9 +46,8 @@ describe('/threads endpoint', () => {
 
   const reply = {
     id: 'reply-1',
-    commentParentId: 'comment-1',
+    threadCommentId: 'comment-1',
     userId: commentUser.id,
-    threadId: thread.id,
     content: 'content',
   };
 
@@ -362,7 +362,7 @@ describe('/threads endpoint', () => {
       await UsersTableTestHelper.addUser(commentUser);
       await ThreadsTableTestHelper.createThread(thread);
       await ThreadCommentsTableTestHelper.addNewComment(comment);
-      await ThreadCommentsTableTestHelper.addNewComment(reply);
+      await ThreadCommentRepliesTableTestHelper.addNewCommentReply(reply);
 
       const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken(user);
@@ -387,7 +387,7 @@ describe('/threads endpoint', () => {
       await UsersTableTestHelper.addUser(commentUser);
       await ThreadsTableTestHelper.createThread(thread);
       await ThreadCommentsTableTestHelper.addNewComment(comment);
-      await ThreadCommentsTableTestHelper.addNewComment(reply);
+      await ThreadCommentRepliesTableTestHelper.addNewCommentReply(reply);
 
       const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken(commentUser);
