@@ -103,6 +103,21 @@ describe('ThreadRepositoryPostgres', () => {
       expect(thread.date).toEqual(createdDate);
       expect(thread.username).toEqual(userTest.username);
     });
+
+    it('should return null when thread not found', async () => {
+      const createdDate = new Date();
+      await ThreadsTableTestHelper.createThread({
+        id: 'thread-12345',
+        title: 'new thread title',
+        content: 'thread content',
+        userId: userTest.id,
+        createdDate,
+      });
+
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+      const thread = await threadRepositoryPostgres.getDetailThreadById('worng-thread-id');
+      expect(thread).toBeNull();
+    });
   });
 
   describe('verifyThreadAvailability function', () => {

@@ -2,11 +2,7 @@ const pool = require('../src/Infrastructures/database/postgres/pool');
 
 const ThreadsTableTestHelper = {
   async createThread({
-    id = 'thread-123',
-    title = 'new thread title',
-    content = 'thread content',
-    userId = 'user-123',
-    createdDate = null,
+    id, title, content, userId, createdDate,
   }) {
     let date = createdDate;
     if (!createdDate) {
@@ -22,14 +18,6 @@ const ThreadsTableTestHelper = {
     const result = await pool.query({
       text: 'SELECT * FROM threads WHERE id = $1',
       values: [id],
-    });
-    return result.rows;
-  },
-
-  async getThreadByUserId(userId) {
-    const result = await pool.query({
-      text: 'SELECT * FROM threads WHERE user_id = $1',
-      values: [userId],
     });
     return result.rows;
   },

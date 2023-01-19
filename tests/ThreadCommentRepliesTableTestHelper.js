@@ -29,11 +29,10 @@ const ThreadCommentRepliesTableTestHelper = {
     return result.rows;
   },
 
-  async softDeleteThreadCommentById(id, deletedAt = null) {
-    const now = (deletedAt) || new Date();
+  async softDeleteThreadCommentById(id, deletedAt) {
     const result = await pool.query({
       text: 'UPDATE thread_comment_replies SET deleted_at = $2  WHERE id = $1',
-      values: [id, now],
+      values: [id, deletedAt],
     });
     return result.rows;
   },
