@@ -22,6 +22,14 @@ class ThreadCommentRepository {
   async deleteCommentById(threadCommentId) {
     throw new Error('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
+
+  async increaseLikeComment(commentId) {
+    throw new Error('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+  }
+
+  async decreaseLikeComment(commentId) {
+    throw new Error('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+  }
 }
 
 module.exports = ThreadCommentRepository;

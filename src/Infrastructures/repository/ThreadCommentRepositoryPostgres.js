@@ -108,6 +108,24 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
       owner: comment.user_id,
     };
   }
+
+  async increaseLikeComment(commentId) {
+    await this._pool.query({
+      text: `UPDATE thread_comments
+        SET like_count = like_count + 1
+        WHERE id = $1`,
+      values: [commentId],
+    });
+  }
+
+  async decreaseLikeComment(commentId) {
+    await this._pool.query({
+      text: `UPDATE thread_comments
+        SET like_count = like_count - 1
+        WHERE id = $1`,
+      values: [commentId],
+    });
+  }
 }
 
 module.exports = ThreadCommentRepositoryPostgres;
