@@ -10,6 +10,10 @@ class UserCommentLikeRepository {
   async removeLike({ threadCommentId, userId }) {
     throw new Error('USER_COMMENT_LIKE_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
+
+  async countLikeByCommentIds(threadCommentIds) {
+    throw new Error('USER_COMMENT_LIKE_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+  }
 }
 
 module.exports = UserCommentLikeRepository;

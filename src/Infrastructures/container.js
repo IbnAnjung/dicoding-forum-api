@@ -196,6 +196,10 @@ container.register([
           name: 'threadCommentReplyRepository',
           internal: ThreadCommentReplyRepository.name,
         },
+        {
+          name: 'userCommentLikeRepository',
+          internal: UserCommentLikeRepository.name,
+        },
       ],
     },
   },

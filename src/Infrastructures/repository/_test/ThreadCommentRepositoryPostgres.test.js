@@ -248,44 +248,4 @@ describe('The ThreadCommentRepositoryPostgres', () => {
       });
     });
   });
-
-  describe('increaseLikeComment', () => {
-    it('should increase like +=1', async () => {
-      await ThreadCommentsTableTestHelper.addNewComment({
-        id: 'comment-123',
-        content: 'conetent',
-        threadId: thread.id,
-        userId: userTest.id,
-        createdDate: new Date(),
-      });
-
-      const repo = new ThreadCommentRepositoryPostgres(pool, {});
-      await repo.increaseLikeComment('comment-123');
-      await repo.increaseLikeComment('comment-123');
-      await repo.increaseLikeComment('comment-123');
-
-      const comments = await ThreadCommentsTableTestHelper.findThreadCommentById('comment-123');
-      expect(comments[0].like_count).toEqual(3);
-    });
-  });
-
-  describe('decreaseLikeComment', () => {
-    it('should increase like -=1', async () => {
-      await ThreadCommentsTableTestHelper.addNewComment({
-        id: 'comment-123',
-        content: 'conetent',
-        threadId: thread.id,
-        userId: userTest.id,
-        createdDate: new Date(),
-      });
-
-      const repo = new ThreadCommentRepositoryPostgres(pool, {});
-      await repo.increaseLikeComment('comment-123');
-      await repo.increaseLikeComment('comment-123');
-      await repo.decreaseLikeComment('comment-123');
-
-      const comments = await ThreadCommentsTableTestHelper.findThreadCommentById('comment-123');
-      expect(comments[0].like_count).toEqual(1);
-    });
-  });
 });

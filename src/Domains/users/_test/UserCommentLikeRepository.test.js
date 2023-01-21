@@ -7,5 +7,6 @@ describe('The UserCommentLikeRepository interface', () => {
     await expect(userCommentRepository.isUserLikeComment({})).rejects.toThrowError('USER_COMMENT_LIKE_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     await expect(userCommentRepository.addLike({})).rejects.toThrowError('USER_COMMENT_LIKE_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     await expect(userCommentRepository.removeLike({})).rejects.toThrowError('USER_COMMENT_LIKE_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+    await expect(userCommentRepository.countLikeByCommentIds()).rejects.toThrowError('USER_COMMENT_LIKE_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   });
 });

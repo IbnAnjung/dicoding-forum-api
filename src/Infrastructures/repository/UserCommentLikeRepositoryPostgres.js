@@ -33,6 +33,17 @@ class UserCommentLikeRepositoryPostgres extends UserCommentLikeRepository {
       values: [userId, threadCommentId],
     });
   }
+
+  async countLikeByCommentIds(threadCommentIds) {
+    const res = await this._pool.query({
+      text: `SELECT comment_id, COUNT(comment_id) total_like FROM user_comment_likes
+        WHERE comment_id = ANY($1) GROUP BY comment_id
+        ORDER BY comment_id`,
+      values: [threadCommentIds],
+    });
+
+    return res.rows;
+  }
 }
 
 module.exports = UserCommentLikeRepositoryPostgres;

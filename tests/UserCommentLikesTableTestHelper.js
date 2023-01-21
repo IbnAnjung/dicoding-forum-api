@@ -31,14 +31,6 @@ const UserCommentLikesTableTestHelper = {
 
     return result.rows;
   },
-
-  async deleteUserCommentLike({ userId, threadCommentId }) {
-    await pool.query({
-      text: `DELETE user_comment_likes 
-        WHERE user_id = $1 and comment_id = $2`,
-      values: [userId, threadCommentId],
-    });
-  },
 };
 
 module.exports = UserCommentLikesTableTestHelper;

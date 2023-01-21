@@ -142,4 +142,33 @@ describe('UseCommentLikeRepositoryPostgres', () => {
       expect(userLike.length).toEqual(0);
     });
   });
+
+  describe('countLikeByCommentIds function()', () => {
+    it('should add remove user comments like', async () => {
+      await UserCommentLikesTableTestHelper.addLike({
+        userId: userTest.id,
+        threadCommentId: comment1.id,
+      });
+
+      await UserCommentLikesTableTestHelper.addLike({
+        userId: userCommentTest.id,
+        threadCommentId: comment1.id,
+      });
+
+      await UserCommentLikesTableTestHelper.addLike({
+        userId: userCommentTest.id,
+        threadCommentId: comment2.id,
+      });
+
+      const repo = new UserCommentLikeRepositoryPostgres(pool);
+
+      const comments = await repo.countLikeByCommentIds([comment1.id, comment2.id]);
+
+      expect(comments.length).toEqual(2);
+      expect(comments[0].comment_id).toEqual(comment1.id);
+      expect(comments[0].total_like).toEqual('2');
+      expect(comments[1].comment_id).toEqual(comment2.id);
+      expect(comments[1].total_like).toEqual('1');
+    });
+  });
 });

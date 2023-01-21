@@ -1,9 +1,15 @@
 /* eslint-disable no-param-reassign */
 class GetThreadDetailUseCase {
-  constructor({ threadRepository, threadCommentRepository, threadCommentReplyRepository }) {
+  constructor({
+    threadRepository,
+    threadCommentRepository,
+    threadCommentReplyRepository,
+    userCommentLikeRepository,
+  }) {
     this._threadRepository = threadRepository;
     this._threadCommentRepository = threadCommentRepository;
     this._threadCommentReplyRepository = threadCommentReplyRepository;
+    this._userCommentLikeRepository = userCommentLikeRepository;
   }
 
   async execute({ threadId }) {
@@ -13,6 +19,7 @@ class GetThreadDetailUseCase {
     }
 
     const comments = await this._threadCommentRepository.getCommentByThreadId(threadId);
+    const commentIds = comments.map((comment) => comment.id);
     const commentByIds = [];
     await comments.forEach((comment) => {
       const newComment = comment;
@@ -20,7 +27,7 @@ class GetThreadDetailUseCase {
       commentByIds[comment.id] = newComment;
     });
     const replies = await this._threadCommentReplyRepository
-      .getCommentRepliesByCommentIds(comments.map((comment) => comment.id));
+      .getCommentRepliesByCommentIds(commentIds);
     replies.forEach((reply) => {
       const newReply = reply;
       if (newReply.deleted) {
@@ -29,9 +36,22 @@ class GetThreadDetailUseCase {
       delete newReply.deleted;
       commentByIds[newReply.comment].replies.push(newReply);
     });
+
+    const commentLikeById = [];
+    const commentLikes = await this._userCommentLikeRepository.countLikeByCommentIds(commentIds);
+    await commentLikes.forEach((commentLike) => {
+      commentLikeById[commentLike.comment_id] = commentLike.total_like;
+    });
+
     thread.comments = [];
     comments.forEach((comment) => {
       const newComment = commentByIds[comment.id];
+      if (commentLikeById[comment.id] !== undefined) {
+        newComment.likeCount = Number(commentLikeById[comment.id]);
+      } else {
+        newComment.likeCount = 0;
+      }
+
       if (newComment.deleted) {
         newComment.content = '**komentar telah dihapus**';
       }
