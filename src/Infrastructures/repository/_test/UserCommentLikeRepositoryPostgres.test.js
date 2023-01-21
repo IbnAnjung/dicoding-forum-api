@@ -63,13 +63,13 @@ describe('UseCommentLikeRepositoryPostgres', () => {
     it('should return false if user not like the comment', async () => {
       await UserCommentLikesTableTestHelper.addLike({
         userId: userTest.id,
-        commentId: comment1.id,
+        threadCommentId: comment1.id,
       });
 
       const repo = new UserCommentLikeRepositoryPostgres(pool);
 
       const isUserLikeComment = await repo.isUserLikeComment({
-        commentId: comment1.id,
+        threadCommentId: comment1.id,
         userId: userCommentTest.id,
       });
 
@@ -79,13 +79,13 @@ describe('UseCommentLikeRepositoryPostgres', () => {
     it('should return true if user already like the comment', async () => {
       await UserCommentLikesTableTestHelper.addLike({
         userId: userTest.id,
-        commentId: comment1.id,
+        threadCommentId: comment1.id,
       });
 
       const repo = new UserCommentLikeRepositoryPostgres(pool);
 
       const isUserLikeComment = await repo.isUserLikeComment({
-        commentId: comment1.id,
+        threadCommentId: comment1.id,
         userId: userTest.id,
       });
 
@@ -98,12 +98,12 @@ describe('UseCommentLikeRepositoryPostgres', () => {
       const repo = new UserCommentLikeRepositoryPostgres(pool);
 
       await repo.addLike({
-        commentId: comment1.id,
+        threadCommentId: comment1.id,
         userId: userCommentTest.id,
       });
 
       await repo.addLike({
-        commentId: comment1.id,
+        threadCommentId: comment1.id,
         userId: userCommentTest.id,
       });
 
@@ -117,18 +117,18 @@ describe('UseCommentLikeRepositoryPostgres', () => {
     it('should add remove user comments like', async () => {
       await UserCommentLikesTableTestHelper.addLike({
         userId: userTest.id,
-        commentId: comment1.id,
+        threadCommentId: comment1.id,
       });
 
       await UserCommentLikesTableTestHelper.addLike({
         userId: userCommentTest.id,
-        commentId: comment1.id,
+        threadCommentId: comment1.id,
       });
 
       const repo = new UserCommentLikeRepositoryPostgres(pool);
 
       await repo.removeLike({
-        commentId: comment1.id,
+        threadCommentId: comment1.id,
         userId: userCommentTest.id,
       });
 
@@ -137,7 +137,7 @@ describe('UseCommentLikeRepositoryPostgres', () => {
 
       const userLike = await UserCommentLikesTableTestHelper.findUserCommentLike({
         userId: userCommentTest.id,
-        commentId: comment1.id,
+        threadCommentId: comment1.id,
       });
       expect(userLike.length).toEqual(0);
     });

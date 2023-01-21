@@ -1,13 +1,13 @@
 class UserCommentLikeRepository {
-  async isUserLikeComment({ commentId, userId }) {
+  async isUserLikeComment({ threadCommentId, userId }) {
     throw new Error('USER_COMMENT_LIKE_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
 
-  async addLike({ commentId, userId }) {
+  async addLike({ threadCommentId, userId }) {
     throw new Error('USER_COMMENT_LIKE_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
 
-  async removeLike({ commentId, userId }) {
+  async removeLike({ threadCommentId, userId }) {
     throw new Error('USER_COMMENT_LIKE_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
 }
