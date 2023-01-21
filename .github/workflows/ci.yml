@@ -18,9 +18,9 @@ jobs:
       postgrest:
         image: postgrest
         env:
-          POSTGRES_DB: forum_api
-          POSTGRES_USER: dicoding
-          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: ${{ secrets.PGDATABASE_TEST }}
+          POSTGRES_USER: ${{ secrets.PGUSER_TEST }}
+          POSTGRES_PASSWORD: ${{ secrets.PGPASSWORD_TEST }}
         options:
           --health-cmd pg_isready
           --health-interval 10s
