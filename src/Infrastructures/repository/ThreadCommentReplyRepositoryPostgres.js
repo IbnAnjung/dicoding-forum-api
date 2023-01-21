@@ -64,7 +64,7 @@ class ThreadCommentReplyRepositoryPostgres extends ThreadCommentReplyRepository 
         JOIN "thread_comments" ON "thread_comment_replies".thread_comment_id = "thread_comments".id 
         JOIN "users" ON "thread_comment_replies".user_id = "users".id
         WHERE "thread_comment_replies".thread_comment_id = ANY ($1)
-        ORDER BY "thread_comment_replies".created_at ASC`,
+        ORDER BY "thread_comment_replies".id ASC`,
       values: [commentIds],
     });
 
