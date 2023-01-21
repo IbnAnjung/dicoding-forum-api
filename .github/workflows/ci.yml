@@ -17,6 +17,9 @@ jobs:
     services:
       postgrest:
         image: postgrest
+        credentials:
+           username: ${{ secrets.docker_username }}
+           password: ${{ secrets.docker_password }}
         env:
           POSTGRES_DB: ${{ secrets.PGDATABASE_TEST }}
           POSTGRES_USER: ${{ secrets.PGUSER_TEST }}
