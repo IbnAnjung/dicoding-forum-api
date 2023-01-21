@@ -21,9 +21,9 @@ jobs:
            username: ${{ secrets.docker_username }}
            password: ${{ secrets.docker_password }}
         env:
-          POSTGRES_DB: ${{ secrets.PGDATABASE_TEST }}
-          POSTGRES_USER: ${{ secrets.PGUSER_TEST }}
-          POSTGRES_PASSWORD: ${{ secrets.PGPASSWORD_TEST }}
+          POSTGRES_DB: ${{ secrets.PGDATABASE }}
+          POSTGRES_USER: ${{ secrets.PGUSER }}
+          POSTGRES_PASSWORD: ${{ secrets.PGPASSWORD }}
         options:
           --health-cmd pg_isready
           --health-interval 10s
@@ -40,7 +40,7 @@ jobs:
     - name: npm install migrate and test
       run: |
         npm install
-        npm run migrate:test up
+        npm run migrate up
         npm run test
       env:
         CI: true
