@@ -15,8 +15,8 @@ jobs:
         node-version: [14.x]
 
     services:
-      postgrest:
-        image: postgrest
+      postgres:
+        image: postgres
         credentials:
            username: ${{ secrets.docker_username }}
            password: ${{ secrets.docker_password }}
