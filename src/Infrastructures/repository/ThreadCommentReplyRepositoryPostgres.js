@@ -57,8 +57,8 @@ class ThreadCommentReplyRepositoryPostgres extends ThreadCommentReplyRepository 
 
   async getCommentRepliesByCommentIds(commentIds) {
     const comments = await this._pool.query({
-      text: `SELECT "thread_comment_replies".id, "users".username, "thread_comments".id comment,
-        "thread_comment_replies".created_at date,"thread_comment_replies".deleted_at deleted,
+      text: `SELECT "thread_comment_replies".id, "users".username, "thread_comments".id as comment_id,
+        "thread_comment_replies".created_at,"thread_comment_replies".deleted_at deleted,
         "thread_comment_replies".content
         FROM "thread_comment_replies"
         JOIN "thread_comments" ON "thread_comment_replies".thread_comment_id = "thread_comments".id 
