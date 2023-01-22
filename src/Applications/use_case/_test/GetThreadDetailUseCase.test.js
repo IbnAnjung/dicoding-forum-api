@@ -2,6 +2,7 @@ const ThreadCommentRepository = require('../../../Domains/threads/ThreadCommentR
 const ThreadCommentReplyRepository = require('../../../Domains/threads/ThreadCommentReplyRepository');
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const GetThreadDetailUseCase = require('../GetThreadDetailUseCase');
+const UserCommentLikeRepository = require('../../../Domains/users/UserCommentLikeRepository');
 
 describe('GetThreadDetailUseCase', () => {
   it('should orchestrating the get detail thread correctly', async () => {
@@ -111,15 +112,29 @@ describe('GetThreadDetailUseCase', () => {
         },
       ]));
 
+    const userCommentLikeRepository = new UserCommentLikeRepository();
+    userCommentLikeRepository.countLikeByCommentIds = jest.fn()
+      .mockImplementation(() => Promise.resolve([
+        {
+          comment_id: 'comments-1',
+          total_like: 2,
+        },
+      ]));
+
     const uc = new GetThreadDetailUseCase({
-      threadRepository, threadCommentRepository, threadCommentReplyRepository,
+      threadRepository,
+      threadCommentRepository,
+      threadCommentReplyRepository,
+      userCommentLikeRepository,
     });
     const threadDetail = await uc.execute({ threadId: thread.id });
-
+    const commentIds = comments.map((comment) => comment.id);
     expect(threadRepository.getDetailThreadById).toBeCalledWith(thread.id);
     expect(threadCommentRepository.getCommentByThreadId).toBeCalledWith(thread.id);
     expect(threadCommentReplyRepository.getCommentRepliesByCommentIds)
-      .toBeCalledWith(comments.map((comment) => comment.id));
+      .toBeCalledWith(commentIds);
+    expect(userCommentLikeRepository.countLikeByCommentIds)
+      .toBeCalledWith(commentIds);
 
     expect(threadDetail.id).toEqual(thread.id);
     expect(threadDetail.title).toEqual(thread.title);
@@ -132,6 +147,7 @@ describe('GetThreadDetailUseCase', () => {
     expect(threadDetail.comments[0].username).toEqual(comments[0].username);
     expect(threadDetail.comments[0].date).toEqual(comments[0].date);
     expect(threadDetail.comments[0].content).toEqual(comments[0].content);
+    expect(threadDetail.comments[0].likeCount).toEqual(2);
     expect(threadDetail.comments[0].replies).toHaveLength(2);
     expect(threadDetail.comments[0].replies[0].id).toEqual(replies[0].id);
     expect(threadDetail.comments[0].replies[0].username).toEqual(replies[0].username);
@@ -146,6 +162,7 @@ describe('GetThreadDetailUseCase', () => {
     expect(threadDetail.comments[1].username).toEqual(comments[1].username);
     expect(threadDetail.comments[1].date).toEqual(comments[1].date);
     expect(threadDetail.comments[1].content).toEqual('**komentar telah dihapus**');
+    expect(threadDetail.comments[1].likeCount).toEqual(0);
     expect(threadDetail.comments[1].replies[0].id).toEqual(replies[2].id);
     expect(threadDetail.comments[1].replies[0].username).toEqual(replies[2].username);
     expect(threadDetail.comments[1].replies[0].date).toEqual(replies[2].date);

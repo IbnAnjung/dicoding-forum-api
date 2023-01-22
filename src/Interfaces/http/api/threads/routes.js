@@ -24,6 +24,14 @@ const routes = (handler) => ([
     },
   },
   {
+    method: 'PUT',
+    path: '/threads/{threadId}/comments/{commentId}/likes',
+    handler: handler.putLikeThreadCommentHandler,
+    options: {
+      auth: 'jwt',
+    },
+  },
+  {
     method: 'DELETE',
     path: '/threads/{threadId}/comments/{threadCommentId}',
     handler: handler.deleteThreadCommentHandler,

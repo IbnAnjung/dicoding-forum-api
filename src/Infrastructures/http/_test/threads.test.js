@@ -8,6 +8,7 @@ const pool = require('../../database/postgres/pool');
 const createServer = require('../createServer');
 const container = require('../../container');
 const JwtTokenManager = require('../../security/JwtTokenManager');
+const UserCommentLikesTableTestHelper = require('../../../../tests/UserCommentLikesTableTestHelper');
 
 describe('/threads endpoint', () => {
   afterAll(async () => {
@@ -438,6 +439,14 @@ describe('/threads endpoint', () => {
         userId: commentUser.id,
         creaatedDate: commentDates['comment-2'],
       });
+      await UserCommentLikesTableTestHelper.addLike({
+        userId: user.id,
+        threadCommentId: 'comment-2',
+      });
+      await UserCommentLikesTableTestHelper.addLike({
+        userId: commentUser.id,
+        threadCommentId: 'comment-2',
+      });
 
       commentDates['comment-1'] = new Date();
       await ThreadCommentsTableTestHelper.addNewComment({
@@ -499,6 +508,7 @@ describe('/threads endpoint', () => {
       expect(typeof resComment1.date).toBe('string');
       expect(resComment1.date).toEqual(new Date(commentDates['comment-2']).toISOString());
       expect(resComment1.content).toBe('comment');
+      expect(resComment1.likeCount).toBe(2);
       expect(resComment1.replies).toHaveLength(2);
       expect(resComment1.replies[0].id).toEqual('reply-1');
       expect(resComment1.replies[0].username).toEqual(user.username);
@@ -515,6 +525,7 @@ describe('/threads endpoint', () => {
       expect(resComment2.id).toEqual('comment-1');
       expect(resComment2.username).toEqual(user.username);
       expect(typeof resComment2.date).toBe('string');
+      expect(resComment2.likeCount).toBe(0);
       // expect(resComment2.date).toEqual(new Date(commentDates['comment-1']).toISOString());
       expect(resComment2.content).toEqual('**komentar telah dihapus**');
       expect(resComment2.replies).toHaveLength(0);
@@ -607,6 +618,82 @@ describe('/threads endpoint', () => {
       expect(typeof resReply.id).toBe('string');
       expect(resReply.content).toEqual('content');
       expect(resReply.owner).toEqual(user.id);
+    });
+  });
+
+  describe('WHEN PUT /threads/{threadId}/comments/{commentId}/likes', () => {
+    it('should response 404 when threadId not found', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+      await ThreadsTableTestHelper.createThread(thread);
+      await ThreadsTableTestHelper.createThread(thread2);
+      await ThreadCommentsTableTestHelper.addNewComment(comment);
+      await ThreadCommentsTableTestHelper.addNewComment(comment2);
+
+      const jwtTokenManager = new JwtTokenManager(Jwt.token);
+      const accessToken = await jwtTokenManager.createAccessToken(user);
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/wrong-${thread.id}/comments/${comment2.id}/likes`,
+        payload: {
+          content: 'content',
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJSON.status).toEqual('fail');
+      expect(typeof responseJSON.message).toBe('string');
+    });
+
+    it('should response 404 when comment not found', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+
+      const jwtTokenManager = new JwtTokenManager(Jwt.token);
+      const accessToken = await jwtTokenManager.createAccessToken(user);
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${thread.id}/comments/${comment.id}/likes`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJSON.status).toEqual('fail');
+      expect(typeof responseJSON.message).toBe('string');
+    });
+
+    it('should response 200 and create valid response', async () => {
+      await UsersTableTestHelper.addUser(user);
+      await UsersTableTestHelper.addUser(commentUser);
+      await ThreadsTableTestHelper.createThread(thread);
+      await ThreadCommentsTableTestHelper.addNewComment(comment);
+
+      const jwtTokenManager = new JwtTokenManager(Jwt.token);
+      const accessToken = await jwtTokenManager.createAccessToken(user);
+
+      const server = await createServer(container);
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${thread.id}/comments/${comment.id}/likes`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJSON.status).toEqual('success');
     });
   });
 });
