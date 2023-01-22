@@ -15,12 +15,15 @@ jobs:
         node-version: [14.x]
 
     services:
-      postgrest:
-        image: postgrest
+      postgres:
+        image: postgres
+        credentials:
+           username: ${{ secrets.docker_username }}
+           password: ${{ secrets.docker_password }}
         env:
-          POSTGRES_DB: forum_api
-          POSTGRES_USER: dicoding
-          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: ${{ secrets.PGDATABASE }}
+          POSTGRES_USER: ${{ secrets.PGUSER }}
+          POSTGRES_PASSWORD: ${{ secrets.PGPASSWORD }}
         options:
           --health-cmd pg_isready
           --health-interval 10s
