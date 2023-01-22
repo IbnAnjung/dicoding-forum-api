@@ -173,18 +173,19 @@ describe('The ThreadCommentReplyRepositoryPostgres', () => {
       const res = await repo
         .getCommentRepliesByCommentIds([replies1.threadCommentId, replies2.threadCommentId]);
       expect(res).toHaveLength(2);
+
       expect(res[0].id).toEqual(replies1.id);
       expect(res[0].content).toEqual(replies1.content);
       expect(res[0].username).toEqual(userCommentTest.username);
-      expect(res[0].comment).toEqual(replies1.threadCommentId);
-      expect(res[0].date).toEqual(replies1.createdDate);
+      expect(res[0].comment_id).toEqual(replies1.threadCommentId);
+      expect(res[0].created_at).toEqual(replies1.createdDate);
       expect(res[0].deleted).toBeNull();
 
       expect(res[1].id).toEqual(replies2.id);
       expect(res[1].content).toEqual(replies2.content);
       expect(res[1].username).toEqual(userCommentTest.username);
-      expect(res[1].comment).toEqual(replies2.threadCommentId);
-      expect(res[1].date).toEqual(replies2.createdDate);
+      expect(res[1].comment_id).toEqual(replies2.threadCommentId);
+      expect(res[1].created_at).toEqual(replies2.createdDate);
       expect(res[1].deleted).toEqual(replies2DeletedDate);
     });
   });

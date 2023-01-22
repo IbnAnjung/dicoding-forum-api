@@ -34,7 +34,9 @@ class GetThreadDetailUseCase {
         newReply.content = '**balasan telah dihapus**';
       }
       delete newReply.deleted;
-      commentByIds[newReply.comment].replies.push(newReply);
+      newReply.date = newReply.created_at;
+      delete newReply.created_at;
+      commentByIds[newReply.comment_id].replies.push(newReply);
     });
 
     const commentLikeById = [];
